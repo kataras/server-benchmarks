@@ -1,0 +1,6 @@
+.vscode
+*.exe
+bin
+obj
+node_modules
+go.sum

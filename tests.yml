@@ -1,0 +1,75 @@
+# ::Begin sample YAML::
+#
+# - Name: Sample Test Name
+  # Description: Stress Test Description...what it tests or what a client does and expects.
+  # NumberOfConnections: 125
+  #
+  # NumberOfRequests: 100000
+  # or
+  # Duration: 5s
+  #
+  # Timeout: 2s
+  # Method: POST
+  # BodyFile: ./request_payload.json
+  # Headers:
+  #  Key: Value
+  # URL: http://localhost:5000
+  # Envs:
+  #  - Repo: username/repo
+  #    Language: Go
+  #    Dir: ./_code/sample/framework_name
+  #    Exec: >-
+  #      command 1
+  #      command 2
+  #      go run main.go
+  #    or
+  #    NotSupported: true
+#
+# ::End sample YAML::
+- Name: Static
+  Description: Fires 1000000 requests, receives a static message as response.
+  NumberOfRequests: 1000000
+  Method: GET
+  URL: http://localhost:5000
+  Envs:
+    - Repo: gin-gonic/gin
+    - Repo: kataras/iris
+    - Repo: labstack/echo
+    - Name: Kestrel
+      Repo: dotnet/aspnetcore
+      Language: CSharp
+    - Repo: go-martini/martini
+    - Repo: pressly/chi
+- Name: Parameterized
+  Description: >-
+     Fires 250000 requests with a dynamic parameter of string,
+     receives a hello text based on the parameter as response.
+  NumberOfRequests: 250000
+  Method: GET
+  URL: http://localhost:5000/hello/world
+  Envs:
+    - Repo: gin-gonic/gin
+    - Repo: kataras/iris
+    - Repo: labstack/echo
+    - Name: Kestrel
+      Repo: dotnet/aspnetcore
+      Language: CSharp
+    - Repo: go-martini/martini
+    - Repo: pressly/chi
+- Name: REST
+  Description: >-
+      Fires 200000 requests with a dynamic parameter of int,
+      sends JSON as request body and receives JSON as response.
+  NumberOfRequests: 200000
+  Method: POST
+  BodyFile: ./_code/rest/request.json
+  URL: http://localhost:5000/42
+  Envs:
+    - Repo: gin-gonic/gin
+    - Repo: kataras/iris
+    - Repo: labstack/echo
+    - Name: Kestrel
+      Repo: dotnet/aspnetcore
+      Language: CSharp
+    - Repo: go-martini/martini
+    - Repo: pressly/chi
