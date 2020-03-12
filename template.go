@@ -5,40 +5,23 @@ import (
 	"text/template"
 )
 
-var readmeTmpl = template.Must(template.New("").
-	Funcs(template.FuncMap{
+type templateData struct {
+	Datetime string
+	System   systemInfo
+	Tests    []*Test
+}
+
+var (
+	rootTmpl *template.Template
+)
+
+func init() {
+	rootTmpl = template.New("")
+
+	template.Must(rootTmpl.New("results").Funcs(template.FuncMap{
 		"formatTimeUs": formatTimeUs,
 		"formatBinary": formatBinary,
-	}).Parse(`# Server Benchmarks
-
-A benchmark suite which, **transparently**, stress-tests web servers and generates a report in markdown. It measures the requests per second, data transferred and time between requests and responses.
-
-## Why YABS (Yet Another Benchmark Suite)
-
-It's true, there already enough of benchmark suites to play around. However, most of them don't even contain real-life test applications to benchmark, therefore the results are not always accurate e.g. a route handler executes SQL queries or reads and sends JSON. This benchmark suite is a fresh start, it can contain any type of tests as the tests are running as self-executables and the measuring is done by a popular and trusted 3rd-party software which acts as a real HTTP Client (one more reason of transparency). [Contributions](CONTRIBUTING.md) and improvements are always welcomed here.
-
-## Use case
-
-Measure the performance of application(s) between different versions or implementations (or web frameworks).
-
-This suite can be further customized, through its [tests.yml](tests.yml) file, in order to test personal or internal web applications before their public releases.
-
-## How to run
-
-1. Install [Go](https://golang.org/dl), [.NET Core](https://dotnet.microsoft.com/download) and [Node.js](https://nodejs.org/en/download/current/)
-2. Clone the repository
-3. Stress-tests are described inside [tests.yml](tests.yml) file, it can be customized to fit your needs
-4. Execute: ` + "`go build -o server-benchmarks`" + `
-5. Run and wait for the executable _server-benchmarks_ (or _server-benchmarks.exe_ for windows) to finish
-6. Read the results from the generated _README.md_ file.
-
-## Benchmarks
-
-The following generated README contains benchmark results from builtin tests between popular **HTTP/2 web frameworks as of 2020**.
-
-_Note:_ it's possible that the contents of this file will be updated regularly to accept even more tests cases and frameworks.
-
-## System
+	}).Parse(`## System
 
 |    |    |
 |----|:---|
@@ -77,20 +60,54 @@ _Note:_ it's possible that the contents of this file will be updated regularly t
 {{ range $env := $test.Envs -}}
 | [{{ $env.GetName }}](https://github.com/{{$env.Repo}}) | {{ $env.Language }} | 
 {{- if $env.CanBenchmark }}
-    {{- printf "%.2f" $env.Result.RequestsPerSecond.Mean }} | 
-    {{- formatTimeUs $env.Result.Latency.Mean }} | 
-    {{- formatBinary $env.Result.Throughput }} | 
-    {{- printf "%.2f" $env.Result.TimeTakenSeconds }}s | 
+	{{- printf "%.2f" $env.Result.RequestsPerSecond.Mean }} | 
+	{{- formatTimeUs $env.Result.Latency.Mean }} | 
+	{{- formatBinary $env.Result.Throughput }} | 
+	{{- printf "%.2f" $env.Result.TimeTakenSeconds }}s | 
 {{- else -}}
 - | - | - | - | - | - |
 {{- end}}
 {{end -}}
 {{ end -}}
+`))
+
+	template.Must(rootTmpl.New("readme").Parse(`# Server Benchmarks
+
+A benchmark suite which, **transparently**, stress-tests web servers and generates a report in markdown. It measures the requests per second, data transferred and time between requests and responses.
+
+## Why YABS (Yet Another Benchmark Suite)
+
+It's true, there already enough of benchmark suites to play around. However, most of them don't even contain real-life test applications to benchmark, therefore the results are not always accurate e.g. a route handler executes SQL queries or reads and sends JSON. This benchmark suite is a fresh start, it can contain any type of tests as the tests are running as self-executables and the measuring is done by a popular and trusted 3rd-party software which acts as a real HTTP Client (one more reason of transparency). [Contributions](CONTRIBUTING.md) and improvements are always welcomed here.
+
+## Use case
+
+Measure the performance of application(s) between different versions or implementations (or web frameworks).
+
+This suite can be further customized, through its [tests.yml](tests.yml) file, in order to test personal or internal web applications before their public releases.
+
+## How to run
+
+1. Install [Go](https://golang.org/dl), [.NET Core](https://dotnet.microsoft.com/download) and [Node.js](https://nodejs.org/en/download/current/)
+2. Clone the repository
+3. Stress-tests are described inside [tests.yml](tests.yml) file, it can be customized to fit your needs
+4. Execute: ` + "`go build -o server-benchmarks`" + `
+5. Run and wait for the executable _server-benchmarks_ (or _server-benchmarks.exe_ for windows) to finish
+6. Read the results from the generated _README.md_ file.
+
+## Benchmarks
+
+The following generated README contains benchmark results from builtin tests between popular **HTTP/2 web frameworks as of 2020**.
+
+_Note:_ it's possible that the contents of this file will be updated regularly to accept even more tests cases and frameworks.
+
+{{ template "results" .}}
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
 `))
+
+}
 
 // copied from bombardier's source code itself to display identical results.
 type units struct {

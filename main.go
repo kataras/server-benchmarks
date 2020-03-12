@@ -12,8 +12,9 @@ import (
 const (
 	timeLayout = "Jan 2, 2006 at 3:04pm (UTC)"
 
-	inFilename  = "./tests.yml"
-	outFilename = "./README.md"
+	inFilename      = "./tests.yml"
+	readmeFilename  = "./README.md"
+	resultsFilename = "./RESULTS.md"
 )
 
 func main() {
@@ -30,7 +31,9 @@ func main() {
 	// 1. CSV format as well to transfer them to google docs for graphs.
 	// 2. Template: Mark with bold the winners of each test, find the higher reqs/sec
 	//    (time-to-complete can be fixed if Test Duration is provided so we can't depend on that).
-	err = writeReadme(outFilename, tests)
+	err = writeResults(resultsFilename, tests)
+	catch(err)
+	err = writeReadme(readmeFilename, tests)
 	catch(err)
 }
 
@@ -63,11 +66,21 @@ func writeReadme(filename string, tests []*Test) error {
 	}
 	defer readmeFile.Close()
 
-	return readmeTmpl.Execute(readmeFile, struct {
-		Datetime string
-		System   systemInfo
-		Tests    []*Test
-	}{
+	return rootTmpl.ExecuteTemplate(readmeFile, "readme", templateData{
+		Datetime: time.Now().UTC().Format(timeLayout),
+		System:   getSystemInfo(),
+		Tests:    tests,
+	})
+}
+
+func writeResults(filename string, tests []*Test) error {
+	resultsFile, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer resultsFile.Close()
+
+	return rootTmpl.ExecuteTemplate(resultsFile, "results", templateData{
 		Datetime: time.Now().UTC().Format(timeLayout),
 		System:   getSystemInfo(),
 		Tests:    tests,

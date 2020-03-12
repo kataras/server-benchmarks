@@ -43,7 +43,7 @@ namespace netcore {
                 // The (new) .NET System.Text.JSON package is
                 // x2+ times faster than the Newtonsoft.Json one.
                 // So we use that for our bencharks
-                // (remember: as fast as possible se we can have real competitors,
+                // (remember: as fast as possible so we can have real competitors,
                 // even if the code does not look as nice as the Iris' one for example). 
                 // var input = JsonSerializer.Deserialize<testInput> (context.Request.Body); <- does not work...
                 using (StreamReader stream = new StreamReader (context.Request.Body)) {
