@@ -1,0 +1,10 @@
+{
+  "name": "expressjs-throng",
+  "main": "main.js",
+  "author": "Gerasimos (Makis) Maropoulos <kataras2006@hotmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "throng": "^4.0.0"
+  }
+}

@@ -32,12 +32,16 @@
   Method: GET
   URL: http://localhost:5000
   Envs:
+    - Repo: expressjs/express
+      Language: Javascript
     - Repo: gin-gonic/gin
+    - Repo: koajs/koa
+      Language: Javascript
     - Repo: kataras/iris
     - Repo: labstack/echo
     - Name: Kestrel
       Repo: dotnet/aspnetcore
-      Language: CSharp
+      Language: "C#"
     - Repo: go-martini/martini
     - Repo: pressly/chi
 - Name: Parameterized
@@ -48,12 +52,16 @@
   Method: GET
   URL: http://localhost:5000/hello/world
   Envs:
+    - Repo: expressjs/express
+      Language: Javascript
     - Repo: gin-gonic/gin
+    - Repo: koajs/koa
+      Language: Javascript
     - Repo: kataras/iris
     - Repo: labstack/echo
     - Name: Kestrel
       Repo: dotnet/aspnetcore
-      Language: CSharp
+      Language: "C#"
     - Repo: go-martini/martini
     - Repo: pressly/chi
 - Name: REST
@@ -65,11 +73,15 @@
   BodyFile: ./_code/rest/request.json
   URL: http://localhost:5000/42
   Envs:
+    - Repo: expressjs/express
+      Language: Javascript
     - Repo: gin-gonic/gin
+    - Repo: koajs/koa
+      Language: Javascript
     - Repo: kataras/iris
     - Repo: labstack/echo
     - Name: Kestrel
       Repo: dotnet/aspnetcore
-      Language: CSharp
+      Language: "C#"
     - Repo: go-martini/martini
     - Repo: pressly/chi

@@ -214,7 +214,7 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 		case "csharp", "c#", "net", ".net", "aspnetcore", "kestrel", "netcore", "net.core", ".net core":
 			execCommand = "dotnet run -c Release"
 		case "node", "nodejs", "javascript", "js":
-			execCommand = "npm install\nnode main.js"
+			execCommand = "npm install\nnode ."
 		default:
 			return fmt.Errorf("%s:%s unsupported language: %s", t.Name, env.Repo, lang)
 		}
@@ -258,8 +258,9 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 		}
 	}
 
-	fmt.Fprintf(os.Stdout, "$ %s\n", bombardierCommand)
 	time.Sleep(waitAvailability)
+	fmt.Fprintf(os.Stdout, "$ %s\n", bombardierCommand)
+
 	err = benchCmd.Run()
 	if err != nil {
 		return fmt.Errorf("%s\n%s", buf.String(), err)
