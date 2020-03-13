@@ -14,7 +14,7 @@ This suite can be further customized, through its [tests.yml](tests.yml) file, i
 
 ## How to run
 
-1. Install [Go](https://golang.org/dl), [.NET Core](https://dotnet.microsoft.com/download) and [Node.js](https://nodejs.org/en/download/current/)
+1. Install [Go](https://golang.org/dl), [Bombardier](https://github.com/codesenberg/bombardier/releases/tag/v1.2.4), [Node.js](https://nodejs.org/en/download/current/) and [.NET Core](https://dotnet.microsoft.com/download)
 2. Clone the repository
 3. Stress-tests are described inside [tests.yml](tests.yml) file, it can be customized to fit your needs
 4. Execute: `go build -o server-benchmarks`

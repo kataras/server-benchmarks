@@ -76,6 +76,8 @@ func readTests(filename string) ([]*Test, error) {
 }
 
 func writeReadme(filename string, tests []*Test) error {
+	os.MkdirAll(filepath.Dir(filename), os.ModeDir)
+
 	readmeFile, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -90,6 +92,8 @@ func writeReadme(filename string, tests []*Test) error {
 }
 
 func writeResults(filename string, tests []*Test) error {
+	os.MkdirAll(filepath.Dir(filename), os.ModeDir)
+
 	resultsFile, err := os.Create(filename)
 	if err != nil {
 		return err

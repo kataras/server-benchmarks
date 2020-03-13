@@ -5,3 +5,5 @@ obj
 node_modules
 package-lock.json
 go.sum
+tests.dev.yml
+dev

@@ -44,6 +44,7 @@
       Language: "C#"
     - Repo: go-martini/martini
     - Repo: pressly/chi
+    - Repo: gobuffalo/buffalo
 - Name: Parameterized
   Description: >-
      Fires 250000 requests with a dynamic parameter of string,
@@ -64,6 +65,7 @@
       Language: "C#"
     - Repo: go-martini/martini
     - Repo: pressly/chi
+    - Repo: gobuffalo/buffalo
 - Name: REST
   Description: >-
       Fires 200000 requests with a dynamic parameter of int,
@@ -85,3 +87,4 @@
       Language: "C#"
     - Repo: go-martini/martini
     - Repo: pressly/chi
+    - Repo: gobuffalo/buffalo
