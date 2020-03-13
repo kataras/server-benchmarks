@@ -180,9 +180,6 @@ func (r TestResult) Throughput() float64 {
 	return float64(r.BytesRead+r.BytesWritten) / r.TimeTakenSeconds
 }
 
-const waitAvailability = 6 * time.Second
-const waitRuns = 3 * time.Second
-
 const defaultCodeDir = "./_code"
 
 func runBenchmark(t *Test, env *TestEnv) (err error) {
@@ -258,7 +255,7 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 		}
 	}
 
-	time.Sleep(waitAvailability)
+	time.Sleep(*waitServerDur)
 	fmt.Fprintf(os.Stdout, "$ %s\n", bombardierCommand)
 
 	err = benchCmd.Run()
@@ -279,7 +276,7 @@ func benchmark(t *Test) error {
 			continue
 		}
 
-		time.Sleep(waitRuns)
+		time.Sleep(*waitRunDur)
 
 		if err := runBenchmark(t, env); err != nil {
 			return err
@@ -352,6 +349,7 @@ func killCmd(cmd *exec.Cmd) error {
 	case "darwin":
 		return exec.Command("killall", "-KILL", strconv.Itoa(cmd.Process.Pid)).Run()
 	default:
-		return exec.Command("kill", "-INT", "-"+strconv.Itoa(cmd.Process.Pid)).Run()
+		return cmd.Process.Kill()
+		// return exec.Command("kill", "-INT", "-"+strconv.Itoa(cmd.Process.Pid)).Run()
 	}
 }

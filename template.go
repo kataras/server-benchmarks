@@ -87,12 +87,20 @@ This suite can be further customized, through its [tests.yml](tests.yml) file, i
 
 ## How to run
 
-1. Install [Go](https://golang.org/dl), [.NET Core](https://dotnet.microsoft.com/download) and [Node.js](https://nodejs.org/en/download/current/)
+1. Install [Go](https://golang.org/dl), [Bombardier](https://github.com/codesenberg/bombardier/releases/tag/v1.2.4), [Node.js](https://nodejs.org/en/download/current/) and [.NET Core](https://dotnet.microsoft.com/download)
 2. Clone the repository
 3. Stress-tests are described inside [tests.yml](tests.yml) file, it can be customized to fit your needs
 4. Execute: ` + "`go build -o server-benchmarks`" + `
 5. Run and wait for the executable _server-benchmarks_ (or _server-benchmarks.exe_ for windows) to finish
 6. Read the results from the generated _README.md_ file.
+
+### Docker
+
+The only requirement is [Docker](https://docs.docker.com/).
+
+` + "```sh" + `
+$ docker run -v ${PWD}:/data kataras/server-benchmarks
+` + "```" + `
 
 ## Benchmarks
 

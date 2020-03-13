@@ -21,6 +21,14 @@ This suite can be further customized, through its [tests.yml](tests.yml) file, i
 5. Run and wait for the executable _server-benchmarks_ (or _server-benchmarks.exe_ for windows) to finish
 6. Read the results from the generated _README.md_ file.
 
+### Docker
+
+The only requirement is [Docker](https://docs.docker.com/).
+
+```sh
+$ docker run -v ${PWD}:/data kataras/server-benchmarks
+```
+
 ## Benchmarks
 
 The following generated README contains benchmark results from builtin tests between popular **HTTP/2 web frameworks as of 2020**.

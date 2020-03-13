@@ -1,9 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -12,13 +14,26 @@ import (
 const (
 	timeLayout = "Jan 2, 2006 at 3:04pm (UTC)"
 
-	inFilename      = "./tests.yml"
-	readmeFilename  = "./README.md"
-	resultsFilename = "./RESULTS.md"
+	readmeFilename  = "README.md"
+	resultsFilename = "RESULTS.md"
 )
 
+var (
+	waitServerDur = flag.Duration("wait-server", 6*time.Second, "wait time for server readiness")
+	waitRunDur    = flag.Duration("wait-run", 3*time.Second, "wait time between tests")
+	testsFile     = flag.String("i", "./tests.yml", "yaml file path contains the tests to run")
+	outputDir     = flag.String("o", "./", "directory to save generaged RESULTS.md and README.md files")
+)
+
+// server-benchmarks --wait-server=6s --wait-run=3s -i ./tests.yml -o ./results
 func main() {
-	tests, err := readTests(inFilename)
+	flag.Parse()
+
+	if _, err := os.Stat("/.dockerenv"); err == nil || os.IsExist(err) {
+		fmt.Fprintf(os.Stdout, "Running through docker container...")
+	}
+
+	tests, err := readTests(*testsFile)
 	catch(err)
 
 	// TESTS
@@ -27,14 +42,15 @@ func main() {
 		catch(err)
 	}
 
-	// TODO:
-	// 1. CSV format as well to transfer them to google docs for graphs.
-	// 2. Template: Mark with bold the winners of each test, find the higher reqs/sec
-	//    (time-to-complete can be fixed if Test Duration is provided so we can't depend on that).
-	err = writeResults(resultsFilename, tests)
+	// TODO: CSV format as well to transfer them to google docs for graphs.
+	filename := filepath.Join(*outputDir, resultsFilename)
+	err = writeResults(filename, tests)
 	catch(err)
-	err = writeReadme(readmeFilename, tests)
+	fmt.Fprintf(os.Stdout, "Generate: %s\n", filename)
+	filename = filepath.Join(*outputDir, readmeFilename)
+	err = writeReadme(filename, tests)
 	catch(err)
+	fmt.Fprintf(os.Stdout, "Generate: %s\n", filename)
 }
 
 func readTests(filename string) ([]*Test, error) {
