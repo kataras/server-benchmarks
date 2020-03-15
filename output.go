@@ -13,6 +13,7 @@ import (
 )
 
 func writeResults(markdownFilename, spreadsheetID, googleSecretFile string, tests []*Test) error {
+	// Write results as table to the RESULTS.md file.
 	resultsMarkdownFile, err := os.Create(markdownFilename)
 	if err != nil {
 		return err
@@ -27,28 +28,7 @@ func writeResults(markdownFilename, spreadsheetID, googleSecretFile string, test
 		return err
 	}
 
-	if spreadsheetID != "" && googleSecretFile != "" {
-		client := sheets.NewClient(sheets.ServiceAccount(context.TODO(), googleSecretFile, sheets.ScopeReadWrite))
-		// TODO:
-		//
-		// Server |      Test     | Reqs/sec | Latency
-		// ___________________________________________
-		// F1     | Static        | 1        | 1
-		// F2     | Static        | 1        | 1
-		// F1     | Parameterized | 1        | 1
-		// F2     | Parameterized | 1        | 1
-		//
-		// OR
-		//
-		//      Test     | Server | Reqs/sec | Lantency
-		// ____________________________________________
-		// Static        | F1     | 1        | 1
-		// Static        | F2     | 1        | 1
-		// Parameterized | F1     | 1        | 1
-		// Parameterized | F2     | 1        | 1
-		_ = client
-	}
-
+	// Write results to CSV files per test.
 	for _, t := range tests {
 		reqsPerSecond := func(r *TestResult) string {
 			return fmt.Sprintf("%.0f", r.RequestsPerSecond.Mean)
@@ -61,6 +41,43 @@ func writeResults(markdownFilename, spreadsheetID, googleSecretFile string, test
 			return fmt.Sprintf("%.2f", r.Latency.Mean) // formatTimeUs(r.Latency.Mean)
 		}
 		if err = writeCSV(t, "Latency", latency, "_latency"); err != nil {
+			return err
+		}
+	}
+
+	// Push results to a remote google spreadsheet.
+	if spreadsheetID != "" && googleSecretFile != "" {
+		client := sheets.NewClient(sheets.ServiceAccount(context.TODO(), googleSecretFile, sheets.ScopeReadWrite))
+		// Server |      Test     | Reqs/sec | Latency
+		// ___________________________________________
+		// F1     | Static        | X        | X
+		// F2     | Static        | X        | X
+		// F1     | Parameterized | X        | X
+		// F2     | Parameterized | X        | X
+
+		records := [][]interface{}{
+			{"Server", "Test", "Reqs/sec", "Latency"},
+		}
+
+		_, err := client.ClearSpreadsheet(context.TODO(), spreadsheetID, "*")
+		if err != nil {
+			return err
+		}
+
+		for _, t := range tests {
+			for _, env := range t.Envs {
+				if !env.CanBenchmark() {
+					continue
+				}
+
+				records = append(records, []interface{}{
+					env.Name, t.Name, env.Result.RequestsPerSecond.Mean, env.Result.Latency.Mean,
+				})
+			}
+		}
+
+		_, err = client.UpdateSpreadsheet(context.TODO(), spreadsheetID, sheets.ValueRange{Values: records})
+		if err != nil {
 			return err
 		}
 	}

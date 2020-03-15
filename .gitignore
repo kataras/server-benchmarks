@@ -7,3 +7,4 @@ package-lock.json
 go.sum
 tests.dev.yml
 dev
+client_secret.json
