@@ -60,7 +60,7 @@ func init() {
 {{ range $env := $test.Envs -}}
 | [{{ $env.GetName }}](https://github.com/{{$env.Repo}}) | {{ $env.Language }} | 
 {{- if $env.CanBenchmark }}
-	{{- printf "%.2f" $env.Result.RequestsPerSecond.Mean }} | 
+	{{- printf "%.0f" $env.Result.RequestsPerSecond.Mean }} | 
 	{{- formatTimeUs $env.Result.Latency.Mean }} | 
 	{{- formatBinary $env.Result.Throughput }} | 
 	{{- printf "%.2f" $env.Result.TimeTakenSeconds }}s | 

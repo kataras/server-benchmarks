@@ -166,7 +166,9 @@ func (e *TestEnv) GetName() string {
 		panic("invalid repo <" + e.Repo + ">")
 	}
 
-	return strings.Title(e.Repo[idx+1:])
+	name := strings.Title(e.Repo[idx+1:])
+	e.Name = name
+	return name
 }
 
 // CanBenchmark reports whether this test can run on this env.
