@@ -48,20 +48,19 @@ func writeResults(markdownFilename, spreadsheetID, googleSecretFile string, test
 	// Push results to a remote google spreadsheet.
 	if spreadsheetID != "" && googleSecretFile != "" {
 		client := sheets.NewClient(sheets.ServiceAccount(context.TODO(), googleSecretFile, sheets.ScopeReadWrite))
+		_, err := client.ClearSpreadsheet(context.TODO(), spreadsheetID, "*")
+		if err != nil {
+			return err
+		}
+
 		// Server |      Test     | Reqs/sec | Latency
 		// ___________________________________________
 		// F1     | Static        | X        | X
 		// F2     | Static        | X        | X
 		// F1     | Parameterized | X        | X
 		// F2     | Parameterized | X        | X
-
 		records := [][]interface{}{
 			{"Server", "Test", "Reqs/sec", "Latency"},
-		}
-
-		_, err := client.ClearSpreadsheet(context.TODO(), spreadsheetID, "*")
-		if err != nil {
-			return err
 		}
 
 		for _, t := range tests {

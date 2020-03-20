@@ -52,7 +52,7 @@ func init() {
 ### Test:{{ $test.Name}}
 
 {{ if $test.Description -}}
-📖 {{ $test.Description -}}
+📖 {{ $test.ParseDescription $test -}}
 {{ end }}
 
 | Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |

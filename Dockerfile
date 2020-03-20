@@ -66,7 +66,7 @@ RUN go install
 
 VOLUME [ "/data" ]
 
-ENTRYPOINT ["server-benchmarks", "-o", "/data", "-wait-server", "12s", "-wait-run", "6s"]
+ENTRYPOINT ["server-benchmarks", "-o", "/data", "-wait-run", "6s"]
 
 # docker build -t server-benchmarks:latest .
 # docker run -v ${PWD}:/data server-benchmarks

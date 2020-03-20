@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,6 +13,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 )
 
@@ -72,6 +75,26 @@ type (
 		Max    float64 `json:"max"`
 	}
 )
+
+// ParseDescription returns the template-parsed description text.
+func (t *Test) ParseDescription(tmplData interface{}) string {
+	if !strings.Contains(t.Description, "{{") {
+		return t.Description
+	}
+
+	tmpl, err := template.New("description").Parse(t.Description)
+	if err != nil {
+		return err.Error()
+	}
+
+	buf := new(bytes.Buffer)
+	err = tmpl.Execute(buf, tmplData)
+	if err != nil {
+		return err.Error()
+	}
+
+	return buf.String()
+}
 
 func (t *Test) buildArgs() (args []string) {
 	// default concurrent connections (this can be omitted, as it's the bombardier's default).
@@ -257,7 +280,9 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 		}
 	}
 
-	time.Sleep(*waitServerDur)
+	// time.Sleep(*waitServerDur)
+	waitServer(t.URL)
+
 	fmt.Fprintf(os.Stdout, "$ %s\n", bombardierCommand)
 
 	err = benchCmd.Run()
@@ -354,4 +379,26 @@ func killCmd(cmd *exec.Cmd) error {
 		return cmd.Process.Kill()
 		// return exec.Command("kill", "-INT", "-"+strconv.Itoa(cmd.Process.Pid)).Run()
 	}
+}
+
+func waitServer(rawURL string) (int, error) {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return -1, err
+	}
+
+	maxTries := 10
+	tries := 1
+	timeout := time.Duration(2 * time.Second)
+	for tries <= maxTries {
+		conn, err := net.DialTimeout("tcp4", u.Host, timeout)
+		if err == nil {
+			conn.Close()
+			fmt.Fprintf(os.Stdout, "> Connected to %s\n", u.Host)
+			return tries, nil
+		}
+		tries++
+	}
+
+	return maxTries, fmt.Errorf("unreachable %s", rawURL)
 }

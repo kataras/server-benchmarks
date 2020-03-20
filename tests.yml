@@ -27,7 +27,7 @@
 #
 # ::End sample YAML::
 - Name: Static
-  Description: Fires 1000000 requests, receives a static message as response.
+  Description: Fires {{.NumberOfRequests}} requests, receives a static message as response.
   NumberOfRequests: 1000000
   Method: GET
   URL: http://localhost:5000
@@ -47,7 +47,7 @@
     - Repo: gobuffalo/buffalo
 - Name: Parameterized
   Description: >-
-     Fires 250000 requests with a dynamic parameter of string,
+     Fires {{.NumberOfRequests}} requests with a dynamic parameter of string,
      receives a hello text based on the parameter as response.
   NumberOfRequests: 250000
   Method: GET
@@ -68,7 +68,7 @@
     - Repo: gobuffalo/buffalo
 - Name: REST
   Description: >-
-      Fires 200000 requests with a dynamic parameter of int,
+      Fires {{.NumberOfRequests}} requests with a dynamic parameter of int,
       sends JSON as request body and receives JSON as response.
   NumberOfRequests: 200000
   Method: POST

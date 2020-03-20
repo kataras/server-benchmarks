@@ -47,7 +47,7 @@ _Note:_ it's possible that the contents of this file will be updated regularly t
 | [.Net Core](https://dotnet.microsoft.com/) | 3.1.102 |
 | [Node.js](https://nodejs.org/) | v13.10.1 |
 
-> Last updated: Mar 11, 2020 at 9:52pm (UTC)
+> Last updated: Mar 18, 2020 at 2:03am (UTC)
 
 ## Terminology
 
@@ -69,12 +69,15 @@ _Note:_ it's possible that the contents of this file will be updated regularly t
 
 | Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |
 |------|:---------|:---------|:--------|:-----------|:-----------------|
-| [Iris](https://github.com/kataras/iris) | Go |230706.37 |540.64us |40.24MB |4.34s |
-| [Gin](https://github.com/gin-gonic/gin) | Go |204165.70 |611.03us |35.60MB |4.90s |
-| [Kestrel](https://github.com/dotnet/aspnetcore) | CSharp |200807.10 |620.73us |34.07MB |4.98s |
-| [Echo](https://github.com/labstack/echo) | Go |200720.61 |621.68us |34.99MB |4.99s |
-| [Chi](https://github.com/pressly/chi) | Go |197347.35 |632.23us |34.41MB |5.07s |
-| [Martini](https://github.com/go-martini/martini) | Go |165797.23 |751.13us |28.95MB |6.03s |
+| [Iris](https://github.com/kataras/iris) | Go |193538 |644.73us |33.75MB |5.17s |
+| [Kestrel](https://github.com/dotnet/aspnetcore) | C# |185700 |671.60us |31.49MB |5.39s |
+| [Gin](https://github.com/gin-gonic/gin) | Go |180037 |692.86us |31.41MB |5.56s |
+| [Chi](https://github.com/pressly/chi) | Go |177093 |704.56us |30.89MB |5.65s |
+| [Echo](https://github.com/labstack/echo) | Go |174810 |713.51us |30.49MB |5.72s |
+| [Martini](https://github.com/go-martini/martini) | Go |147709 |843.08us |25.80MB |6.76s |
+| [Koa](https://github.com/koajs/koa) | Javascript |104831 |1.20ms |20.43MB |9.66s |
+| [Express](https://github.com/expressjs/express) | Javascript |81845 |1.51ms |21.16MB |12.17s |
+| [Buffalo](https://github.com/gobuffalo/buffalo) | Go |35507 |3.52ms |6.20MB |28.17s |
 
 ### Test:Parameterized
 
@@ -82,12 +85,15 @@ _Note:_ it's possible that the contents of this file will be updated regularly t
 
 | Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |
 |------|:---------|:---------|:--------|:-----------|:-----------------|
-| [Iris](https://github.com/kataras/iris) | Go |210667.30 |592.87us |40.24MB |1.19s |
-| [Chi](https://github.com/pressly/chi) | Go |201200.54 |621.27us |38.40MB |1.25s |
-| [Echo](https://github.com/labstack/echo) | Go |195142.05 |639.42us |37.32MB |1.28s |
-| [Gin](https://github.com/gin-gonic/gin) | Go |194082.20 |642.02us |37.21MB |1.29s |
-| [Kestrel](https://github.com/dotnet/aspnetcore) | CSharp |178642.40 |700.65us |33.02MB |1.41s |
-| [Martini](https://github.com/go-martini/martini) | Go |160786.34 |776.21us |30.76MB |1.56s |
+| [Iris](https://github.com/kataras/iris) | Go |185449 |671.86us |35.53MB |1.35s |
+| [Chi](https://github.com/pressly/chi) | Go |176367 |708.03us |33.70MB |1.42s |
+| [Echo](https://github.com/labstack/echo) | Go |172300 |723.40us |33.01MB |1.45s |
+| [Gin](https://github.com/gin-gonic/gin) | Go |164878 |756.54us |31.59MB |1.52s |
+| [Kestrel](https://github.com/dotnet/aspnetcore) | C# |164297 |758.24us |30.51MB |1.52s |
+| [Martini](https://github.com/go-martini/martini) | Go |143134 |0.87ms |27.42MB |1.75s |
+| [Koa](https://github.com/koajs/koa) | Javascript |66423 |1.68ms |15.91MB |3.37s |
+| [Express](https://github.com/expressjs/express) | Javascript |58290 |2.26ms |15.13MB |4.54s |
+| [Buffalo](https://github.com/gobuffalo/buffalo) | Go |36316 |3.44ms |6.96MB |6.89s |
 
 ### Test:REST
 
@@ -95,13 +101,17 @@ _Note:_ it's possible that the contents of this file will be updated regularly t
 
 | Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |
 |------|:---------|:---------|:--------|:-----------|:-----------------|
-| [Iris](https://github.com/kataras/iris) | Go |167687.80 |742.40us |45.89MB |1.19s |
-| [Gin](https://github.com/gin-gonic/gin) | Go |154708.25 |812.40us |42.06MB |1.31s |
-| [Chi](https://github.com/pressly/chi) | Go |152704.46 |817.39us |40.93MB |1.31s |
-| [Echo](https://github.com/labstack/echo) | Go |151601.11 |822.82us |41.58MB |1.32s |
-| [Martini](https://github.com/go-martini/martini) | Go |138567.52 |0.90ms |37.15MB |1.45s |
-| [Kestrel](https://github.com/dotnet/aspnetcore) | CSharp |127258.53 |0.98ms |39.09MB |1.58s |
+| [Iris](https://github.com/kataras/iris) | Go |144702 |0.86ms |39.44MB |1.39s |
+| [Chi](https://github.com/pressly/chi) | Go |140038 |0.89ms |37.61MB |1.43s |
+| [Gin](https://github.com/gin-gonic/gin) | Go |134783 |0.93ms |36.92MB |1.49s |
+| [Echo](https://github.com/labstack/echo) | Go |131910 |0.94ms |36.14MB |1.52s |
+| [Martini](https://github.com/go-martini/martini) | Go |123382 |1.01ms |33.10MB |1.62s |
+| [Kestrel](https://github.com/dotnet/aspnetcore) | C# |119648 |1.04ms |36.71MB |1.68s |
+| [Buffalo](https://github.com/gobuffalo/buffalo) | Go |56020 |2.23ms |15.37MB |3.57s |
+| [Koa](https://github.com/koajs/koa) | Javascript |46229 |2.70ms |13.67MB |4.34s |
+| [Express](https://github.com/expressjs/express) | Javascript |36306 |3.20ms |13.94MB |5.14s |
+
 
 ## License
 
-This software is licensed under [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
