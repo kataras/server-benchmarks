@@ -1,40 +1,3 @@
-# Server Benchmarks
-
-A benchmark suite which, **transparently**, stress-tests web servers and generates a report in markdown. It measures the requests per second, data transferred and time between requests and responses.
-
-## Why YABS (Yet Another Benchmark Suite)
-
-It's true, there already enough of benchmark suites to play around. However, most of them don't even contain real-life test applications to benchmark, therefore the results are not always accurate e.g. a route handler executes SQL queries or reads and sends JSON. This benchmark suite is a fresh start, it can contain any type of tests as the tests are running as self-executables and the measuring is done by a popular and trusted 3rd-party software which acts as a real HTTP Client (one more reason of transparency). [Contributions](CONTRIBUTING.md) and improvements are always welcomed here.
-
-## Use case
-
-Measure the performance of application(s) between different versions or implementations (or web frameworks).
-
-This suite can be further customized, through its [tests.yml](tests.yml) file, in order to test personal or internal web applications before their public releases.
-
-## How to run
-
-1. Install [Go](https://golang.org/dl), [Bombardier](https://github.com/codesenberg/bombardier/releases/tag/v1.2.4), [Node.js](https://nodejs.org/en/download/current/) and [.NET Core](https://dotnet.microsoft.com/download)
-2. Clone the repository
-3. Stress-tests are described inside [tests.yml](tests.yml) file, it can be customized to fit your needs
-4. Execute: `go build -o server-benchmarks`
-5. Run and wait for the executable _server-benchmarks_ (or _server-benchmarks.exe_ for windows) to finish
-6. Read the results from the generated _README.md_ file.
-
-### Docker
-
-The only requirement is [Docker](https://docs.docker.com/).
-
-```sh
-$ docker run -v ${PWD}:/data kataras/server-benchmarks
-```
-
-## Benchmarks
-
-The following generated README contains benchmark results from builtin tests between popular **HTTP/2 web frameworks as of 2020**.
-
-_Note:_ it's possible that the contents of this file will be updated regularly to accept even more tests cases and frameworks.
-
 ## System
 
 |    |    |
@@ -110,8 +73,3 @@ _Note:_ it's possible that the contents of this file will be updated regularly t
 | [Buffalo](https://github.com/gobuffalo/buffalo) | Go |52407 |2.38ms |14.39MB |3.82s |
 | [Koa](https://github.com/koajs/koa) | Javascript |52194 |2.59ms |14.28MB |4.15s |
 | [Express](https://github.com/expressjs/express) | Javascript |38824 |3.14ms |14.27MB |5.02s |
-
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).

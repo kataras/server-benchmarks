@@ -70,7 +70,7 @@ func writeResults(markdownFilename, spreadsheetID, googleSecretFile string, test
 				}
 
 				records = append(records, []interface{}{
-					env.Name, t.Name, env.Result.RequestsPerSecond.Mean, env.Result.Latency.Mean,
+					env.Name, t.Name, fmt.Sprintf("%.0f", env.Result.RequestsPerSecond.Mean), fmt.Sprintf("%.2f", env.Result.Latency.Mean),
 				})
 			}
 		}
