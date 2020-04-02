@@ -1,0 +1,13 @@
+{
+  "name": "expressjs-throng",
+  "main": "main.js",
+  "author": "Gerasimos (Makis) Maropoulos <kataras2006@hotmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "session-memory-store": "^1.0.0",
+    "throng": "^4.0.0",
+    "uuid": "^7.0.3"
+  }
+}

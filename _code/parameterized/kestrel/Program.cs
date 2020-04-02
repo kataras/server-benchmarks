@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 
 namespace netcore {
     public class Program {
@@ -14,12 +14,12 @@ namespace netcore {
         }
 
         public static IHostBuilder CreateHostBuilder (string[] args) =>
-            Host.CreateDefaultBuilder (args)
-            .ConfigureWebHostDefaults (webBuilder => {
+            Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder => {
                 webBuilder.ConfigureLogging (config => {
-                    config.ClearProviders ();
+                    config.ClearProviders();
                 });
-                webBuilder.UseUrls ("http://localhost:5000");
+                webBuilder.UseUrls("http://localhost:5000");
                 webBuilder.UseStartup<Startup> ();
             });
     }

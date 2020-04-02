@@ -5,7 +5,7 @@ const Router = require('@koa/router');
 const createWorker = require('throng');
 
 
-createWorker(createWebServer) // to make it multi-threading/faster.
+createWorker(createWebServer) // multi-thread.
 
 function createWebServer() {
     const app = new Koa();
