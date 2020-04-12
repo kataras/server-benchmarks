@@ -1,39 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
+using System.Text;
 
 namespace netcore
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public void Configure(IApplicationBuilder app)
         {
-            Configuration = configuration;
+            app.UseMiddleware<PlaintextMiddleware>();
+        }
+    }
+
+    public class PlaintextMiddleware
+    {
+        private static byte[] BodyBytes = Encoding.UTF8.GetBytes("Index");
+
+        public PlaintextMiddleware(RequestDelegate next)
+        {
         }
 
-        public IConfiguration Configuration { get; }
-
-        public void ConfigureServices(IServiceCollection services)
+        public Task Invoke(HttpContext httpContext)
         {
-            services.AddRouting();
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            var routeBuilder = new RouteBuilder(app);
-            routeBuilder.MapGet("/", context =>{
-                return context.Response.WriteAsync("Index");
-            });
-            var routes = routeBuilder.Build();
-            app.UseRouter(routes);
+            return httpContext.Response.Body.WriteAsync(BodyBytes, 0, BodyBytes.Length);
         }
     }
 }

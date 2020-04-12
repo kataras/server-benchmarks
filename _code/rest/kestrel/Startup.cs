@@ -2,10 +2,7 @@ using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
 
 namespace netcore
 {
@@ -22,58 +19,41 @@ namespace netcore
 
     public class Startup
     {
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseMiddleware<JsonMiddleware>();
+        }
+    }
+
+    public class JsonMiddleware
+    {
         private static JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions();
 
-        public IConfiguration Configuration { get; }
-
-        public Startup(IConfiguration configuration)
+        public JsonMiddleware(RequestDelegate next)
         {
-            Configuration = configuration;
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public async Task Invoke(HttpContext context)
         {
-            services.AddRouting();
-        }
+            var reqBytes = new byte[(int)context.Request.ContentLength.GetValueOrDefault(32)];
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            var routeBuilder = new RouteBuilder(app);
-            routeBuilder.MapPost("/{id}", context =>
+            var readTask = context.Request.Body.ReadAsync(reqBytes, 0, reqBytes.Length);
+
+            var readBytesCount = readTask.IsCompleted ? readTask.Result : await readTask;
+
+            var input = JsonSerializer.Deserialize<testInput>(reqBytes.AsSpan(0, readBytesCount), JsonSerializerOptions);
+
+            var output = new testOutput
             {
-                Span<byte> reqBytes = new byte[(int)context.Request.ContentLength.GetValueOrDefault(32)];
+                id = int.TryParse(context.Request.Path.Value.AsSpan().Trim('/'), out int t) ? t : 0,
+                name = input.email
+            };
 
-                var reqLen = context.Request.Body.Read(reqBytes);
-                // Follow: https://www.youtube.com/watch?v=gb3zcdZ-y3M
-                // https://devblogs.microsoft.com/dotnet/try-the-new-system-text-json-apis/
-                // The (new) .NET System.Text.JSON package is
-                // x2+ times faster than the Newtonsoft.Json one.
-                // So we use that for our bencharks
-                // (remember: as fast as possible so we can have real competitors,
-                // even if the code does not look as nice as the Iris' one for example). 
-                var input = JsonSerializer.Deserialize<testInput>(reqBytes.Slice(0, reqLen), JsonSerializerOptions);
+            context.Response.Headers.Add("Content-Type", "application/json; charset=utf-8");
 
-                var output = new testOutput
-                {
-                    // output.id = (int) context.GetRouteValue ("id"); produces:
-                    // Unable to cast object of type 'System.String' to type 'System.Int32'.
-                    // Another disadvantage, in Iris you could get the value as defined in routing,
-                    // e.g. {id:int} without convert it again and again.... Anyway
-                    id = int.TryParse(context.GetRouteValue("id").ToString(), out int t) ? t : 0,
-                    name = input.email
-                };
+            var outputBytes = JsonSerializer.SerializeToUtf8Bytes(output, JsonSerializerOptions);
 
-                context.Response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
-                // default json options: minified output.
-                ReadOnlySpan<byte> outputBytes = JsonSerializer.SerializeToUtf8Bytes(output, typeof(testOutput), JsonSerializerOptions);
-
-                context.Response.Body.Write(outputBytes);
-
-                return Task.CompletedTask;
-            });
-            var routes = routeBuilder.Build();
-            app.UseRouter(routes);
+            _ = context.Response.Body.WriteAsync(outputBytes, 0, outputBytes.Length);
         }
     }
 }

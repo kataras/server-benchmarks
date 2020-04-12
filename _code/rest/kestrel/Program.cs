@@ -22,7 +22,6 @@ namespace netcore
                 webBuilder.ConfigureKestrel(x =>
                 {
                     x.AddServerHeader = false;
-                    x.AllowSynchronousIO = true;
                 });
                 webBuilder.UseUrls("http://localhost:5000");
                 webBuilder.UseStartup<Startup>();

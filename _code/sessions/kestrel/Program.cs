@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 
@@ -23,7 +18,11 @@ namespace netcore
 					webBuilder.ConfigureLogging(config => {
 						config.ClearProviders();
 					});
-					webBuilder.UseUrls("http://localhost:5000");
+                    webBuilder.ConfigureKestrel(x =>
+                    {
+                        x.AddServerHeader = false;
+                    });
+                    webBuilder.UseUrls("http://localhost:5000");
                     webBuilder.UseStartup<Startup>();
                 });
     }
