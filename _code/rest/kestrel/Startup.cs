@@ -1,4 +1,6 @@
+using System;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -20,12 +22,14 @@ namespace netcore
 
     public class Startup
     {
+        private static JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions();
+
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -37,6 +41,9 @@ namespace netcore
             var routeBuilder = new RouteBuilder(app);
             routeBuilder.MapPost("/{id}", context =>
             {
+                Span<byte> reqBytes = new byte[(int)context.Request.ContentLength.GetValueOrDefault(32)];
+
+                var reqLen = context.Request.Body.Read(reqBytes);
                 // Follow: https://www.youtube.com/watch?v=gb3zcdZ-y3M
                 // https://devblogs.microsoft.com/dotnet/try-the-new-system-text-json-apis/
                 // The (new) .NET System.Text.JSON package is
@@ -44,7 +51,7 @@ namespace netcore
                 // So we use that for our bencharks
                 // (remember: as fast as possible so we can have real competitors,
                 // even if the code does not look as nice as the Iris' one for example). 
-                var input = JsonSerializer.DeserializeAsync<testInput>(context.Request.Body).Result;
+                var input = JsonSerializer.Deserialize<testInput>(reqBytes.Slice(0, reqLen), JsonSerializerOptions);
 
                 var output = new testOutput
                 {
@@ -52,13 +59,18 @@ namespace netcore
                     // Unable to cast object of type 'System.String' to type 'System.Int32'.
                     // Another disadvantage, in Iris you could get the value as defined in routing,
                     // e.g. {id:int} without convert it again and again.... Anyway
-                    id = int.Parse(context.GetRouteValue("id").ToString()),
+                    id = int.TryParse(context.GetRouteValue("id").ToString(), out int t) ? t : 0,
                     name = input.email
                 };
 
                 context.Response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+
                 // default json options: minified output.
-                return JsonSerializer.SerializeAsync(context.Response.Body, output);
+                ReadOnlySpan<byte> outputBytes = JsonSerializer.SerializeToUtf8Bytes(output, typeof(testOutput), JsonSerializerOptions);
+
+                context.Response.Body.Write(outputBytes);
+
+                return Task.CompletedTask;
             });
             var routes = routeBuilder.Build();
             app.UseRouter(routes);
