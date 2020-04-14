@@ -1,34 +1,26 @@
 using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 
 namespace netcore
 {
     public class Startup
     {
-        public void Configure(IApplicationBuilder app)
-        {
-            app.UseMiddleware<ParamMiddleware>();
-        }
-    }
-
-    public class ParamMiddleware
-    {
         private static byte[] BodyBytes = System.Text.Encoding.UTF8.GetBytes("Hello ");
 
-        public ParamMiddleware(RequestDelegate next)
+        public void Configure(IApplicationBuilder app)
         {
-        }
+            var routeBuilder = new RouteBuilder(app).MapGet("/hello/{name}", context =>
+            {
+                var name = (string)context.GetRouteValue("name");
+                var outputBytes = new byte[BodyBytes.Length + name.Length];
+                Array.Copy(BodyBytes, outputBytes, BodyBytes.Length);
+                var outputBytesCount = System.Text.Encoding.UTF8.GetBytes(name, outputBytes.AsSpan(BodyBytes.Length));
 
-        public Task Invoke(HttpContext context)
-        {
-            var nameSpan = context.Request.Path.Value.AsSpan().TrimStart("/hello/");
-            var outputBytes = new byte[BodyBytes.Length + nameSpan.Length];
-            BodyBytes.CopyTo(outputBytes, 0);
-            var outputBytesCount = System.Text.Encoding.UTF8.GetBytes(nameSpan, outputBytes.AsSpan(BodyBytes.Length));
+                return context.Response.Body.WriteAsync(outputBytes, 0, BodyBytes.Length + outputBytesCount);
+            });
 
-            return context.Response.Body.WriteAsync(outputBytes, 0, BodyBytes.Length + outputBytesCount);
+            app.UseRouter(routeBuilder.Build());
         }
     }
 }
