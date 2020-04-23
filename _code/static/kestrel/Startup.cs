@@ -15,7 +15,7 @@ namespace netcore
 
     public class PlaintextMiddleware
     {
-        private static byte[] BodyBytes = Encoding.UTF8.GetBytes("Index");
+        private static Encoding Encoding = Encoding.UTF8;
 
         public PlaintextMiddleware(RequestDelegate next)
         {
@@ -23,7 +23,8 @@ namespace netcore
 
         public Task Invoke(HttpContext httpContext)
         {
-            return httpContext.Response.Body.WriteAsync(BodyBytes, 0, BodyBytes.Length);
+            var bytes = Encoding.GetBytes("Index");
+            return httpContext.Response.Body.WriteAsync(bytes, 0, bytes.Length);
         }
     }
 }

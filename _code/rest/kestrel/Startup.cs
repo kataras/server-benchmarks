@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 
 namespace netcore
 {
@@ -21,7 +22,10 @@ namespace netcore
     {
         public void Configure(IApplicationBuilder app)
         {
-            app.UseMiddleware<JsonMiddleware>();
+            var routeBuilder = new RouteBuilder(app)
+                .MapMiddlewarePost("/{id}", x => x.UseMiddleware<JsonMiddleware>());
+
+            app.UseRouter(routeBuilder.Build());
         }
     }
 
