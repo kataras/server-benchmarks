@@ -49,7 +49,7 @@
   Description: >-
      Fires {{.NumberOfRequests}} requests with a dynamic parameter of string,
      receives a hello text based on the parameter as response.
-  NumberOfRequests: 250000
+  NumberOfRequests: 550000
   Method: GET
   URL: http://localhost:5000/hello/world
   Envs:
