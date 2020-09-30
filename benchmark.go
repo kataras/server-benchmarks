@@ -17,6 +17,8 @@ import (
 	"time"
 )
 
+const defaultLanguage = "Go"
+
 type (
 	// Test contains information about test will be performed.
 	Test struct {
@@ -36,11 +38,13 @@ type (
 
 	// TestEnv is the place at which stress-test code should be able to located, per framework.
 	TestEnv struct {
-		Name              string `yaml:"Name"`     // can be empty and retrieved by repo.
-		Repo              string `yaml:"Repo"`     // e.g. kataras/iris
-		Dir               string `yaml:"Dir"`      // e.g. ./benchmarks/iris
+		Name              string `yaml:"Name"` // can be empty and retrieved by repo.
+		Link              string `yaml:"Link"` // the link behind the name. Read GetLink for more.
+		Repo              string `yaml:"Repo"` // e.g. kataras/iris
+		Dir               string `yaml:"Dir"`  // e.g. ./benchmarks/iris
+		absDir            string //  Dir converted to absolute path.
 		Exec              string `yaml:"Exec"`     // e.g. go run main.go, can be multiline.
-		Language          string `yaml:"Language"` // e.g. Go
+		Language          string `yaml:"Language"` // defaults to Go.
 		NotYetImplemented bool   `yaml:"NotYetImplemented"`
 		NotSupported      bool   `yaml:"NotSupported"`
 
@@ -78,22 +82,24 @@ type (
 
 // ParseDescription returns the template-parsed description text.
 func (t *Test) ParseDescription(tmplData interface{}) string {
-	if !strings.Contains(t.Description, "{{") {
-		return t.Description
+	description := t.Description
+	if strings.Contains(description, "{{") {
+		// it's a template.
+		tmpl, err := template.New("description").Parse(t.Description)
+		if err != nil {
+			return err.Error()
+		}
+
+		buf := new(bytes.Buffer)
+		err = tmpl.Execute(buf, tmplData)
+		if err != nil {
+			return err.Error()
+		}
+
+		description = buf.String()
 	}
 
-	tmpl, err := template.New("description").Parse(t.Description)
-	if err != nil {
-		return err.Error()
-	}
-
-	buf := new(bytes.Buffer)
-	err = tmpl.Execute(buf, tmplData)
-	if err != nil {
-		return err.Error()
-	}
-
-	return buf.String()
+	return strings.TrimSuffix(description, "\n")
 }
 
 func (t *Test) buildArgs() (args []string) {
@@ -194,6 +200,28 @@ func (e *TestEnv) GetName() string {
 	return name
 }
 
+// GetLink returns the link under the name.
+// Should target the source code of the test.
+// If it's empty then the repo or the dir is the link.
+// Dir: useful as link for local-only projects.
+// Repo: useful as link when comparing different projects.
+// Link: useful as a relative link to published benchmark,
+// which the code exist in the same or other repository.
+//
+// If Link is empty and Repo is empty too but Dir exists
+// then this Link is automatically set to Dir (as given by the user).
+func (e *TestEnv) GetLink() string {
+	if e.Link != "" {
+		return e.Link
+	}
+
+	if e.Repo != "" {
+		return "https://github.com/" + e.Repo
+	}
+
+	return filepath.ToSlash(e.Dir)
+}
+
 // CanBenchmark reports whether this test can run on this env.
 func (e *TestEnv) CanBenchmark() bool {
 	return !e.NotSupported && !e.NotYetImplemented
@@ -209,23 +237,23 @@ const defaultCodeDir = "./_code"
 
 func runBenchmark(t *Test, env *TestEnv) (err error) {
 	if env.Dir == "" {
-		env.Dir, err = filepath.Abs(filepath.Join(defaultCodeDir, strings.ToLower(t.Name), strings.ToLower(env.GetName())))
+		env.absDir, err = filepath.Abs(filepath.Join(defaultCodeDir, strings.ToLower(t.Name), strings.ToLower(env.GetName())))
 		if err != nil {
 			return
 		}
 	} else if !filepath.IsAbs(env.Dir) {
-		env.Dir, err = filepath.Abs(env.Dir)
+		env.absDir, err = filepath.Abs(env.Dir)
 		if err != nil {
 			return
 		}
 	}
 
 	if env.Language == "" {
-		env.Language = "Go"
+		env.Language = defaultLanguage
 	}
 
 	if env.Exec == "" {
-		if env.Dir == "" {
+		if env.absDir == "" {
 			return fmt.Errorf("%s:%s missing Exec and Dir fields", t.Name, env.Repo)
 		}
 
@@ -252,7 +280,7 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 	buf := new(bytes.Buffer)
 	benchCmd.Stdout = buf
 
-	fmt.Fprintf(os.Stdout, "[%s]\n", env.Dir)
+	fmt.Fprintf(os.Stdout, "[%s]\n", env.absDir)
 
 	commandsToRun := strings.Split(env.Exec, "\n")
 	for i, commandToRun := range commandsToRun {
@@ -263,7 +291,7 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 		fmt.Fprintf(os.Stdout, "$ %s\n", commandToRun)
 
 		cmd := newCmd(commandToRun)
-		cmd.Dir = env.Dir
+		cmd.Dir = env.absDir
 		// watchCmd(cmd)
 
 		// last command should be the server, which blocks, so don't wait for it.

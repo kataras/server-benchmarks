@@ -30,8 +30,12 @@ func init() {
 | OS | {{.System.OS}} |
 | [Bombardier](https://github.com/codesenberg/bombardier) | {{.System.Bombardier}} |
 | [Go](https://golang.org) | {{.System.Go}} |
+{{- if .System.Dotnet }}
 | [.Net Core](https://dotnet.microsoft.com/) | {{.System.Dotnet}} |
+{{ end -}}
+{{- if .System.Node }}
 | [Node.js](https://nodejs.org/) | {{.System.Node}} |
+{{- end }}
 
 > Last updated: {{.Datetime}}
 
@@ -58,7 +62,7 @@ func init() {
 | Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |
 |------|:---------|:---------|:--------|:-----------|:-----------------|
 {{ range $env := $test.Envs -}}
-| [{{ $env.GetName }}](https://github.com/{{$env.Repo}}) | {{ $env.Language }} | 
+| [{{ $env.GetName }}]({{ $env.GetLink }}) | {{ $env.Language }} | 
 {{- if $env.CanBenchmark }}
 	{{- printf "%.0f" $env.Result.RequestsPerSecond.Mean }} | 
 	{{- formatTimeUs $env.Result.Latency.Mean }} | 
@@ -83,18 +87,38 @@ It's true, there already enough of benchmark suites to play around. However, mos
 
 Measure the performance of application(s) between different versions or implementations (or web frameworks).
 
-This suite can be further customized, through its [tests.yml](tests.yml) file, in order to test personal or internal web applications before their public releases.
+This suite can be further customized, through its [tests.yml](https://github.com/kataras/server-benchmarks/blob/master/tests.yml) file, in order to test personal or internal web applications before their public releases.
+
+## Installation
+
+The only requirement for the benchmark tool is the [Go Programming Language](https://golang.org/dl).
+
+` + "```sh" + `
+$ go get -u github.com/kataras/server-benchmarks
+$ go get -u github.com/codesenberg/bombardier
+` + "```sh" + `
+
+Depending on your test cases you may want to install [Node.js](https://nodejs.org/en/download/current/) and [.NET Core](https://dotnet.microsoft.com/download) too.
 
 ## How to run
 
-1. Install [Go](https://golang.org/dl), [Bombardier](https://github.com/codesenberg/bombardier/releases/tag/v1.2.4), [Node.js](https://nodejs.org/en/download/current/) and [.NET Core](https://dotnet.microsoft.com/download)
-2. Clone the repository
-3. Stress-tests are described inside [tests.yml](tests.yml) file, it can be customized to fit your needs
-4. Execute: ` + "`go build -o server-benchmarks`" + `
-5. Run and wait for the executable _server-benchmarks_ (or _server-benchmarks.exe_ for windows) to finish
-6. Read the results from the generated _README.md_ file.
+1. Navigate to your tests directory, the one which includes a  **tests.yml** file
+1. Open a temrinal and execute: ` + "`server-benchmarks`" + `
+2. Wait for the executable _server-benchmarks_ (or _server-benchmarks.exe_ for windows) to finish
+3. That's all, now open the the results from the generated **RESULTS.md** file.
 
-### Docker
+### Advanced usage
+
+- Read the tests from the _./tests.dev.yml_ file
+- Wait 3 seconds between tests
+- Output the results to the _./dev_ directory
+- Write the results to a remote [google spreadsheet](https://www.google.com/sheets/about/) table, which you can convert to a graph later on (as shown above).
+
+` + "```sh" + `
+$ server-benchmarks --wait-run=3s -i ./tests.dev.yml -o ./dev -g-spreadsheet $GoogleSpreadsheetID -g-secret client_secret.json
+` + "```" + `
+
+### Run using Docker
 
 The only requirement is [Docker](https://docs.docker.com/).
 

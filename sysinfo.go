@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"math"
+	"os/exec"
 	"strconv"
 	"strings"
 
@@ -35,16 +37,19 @@ func getSystemInfo() systemInfo {
 		Processor:  cpuStat[0].ModelName,
 		RAM:        formatMemory(float64(vmStat.Total)),
 		OS:         hostStat.Platform,
-		Go:         getToolVer("go version"),
-		Bombardier: getToolVer("bombardier --version"),
-		Dotnet:     getToolVer("dotnet --version"),
-		Node:       getToolVer("node --version"),
+		Go:         getToolVer("go version", ""),
+		Bombardier: getToolVer("bombardier --version", "v1.2.4"),
+		Dotnet:     getToolVer("dotnet --version", ""),
+		Node:       getToolVer("node --version", ""),
 	}
 }
 
-func getToolVer(command string) string {
+func getToolVer(command string, def string) string {
 	cmd := newCmd(command)
-	out, err := cmd.CombinedOutput() // go: os.Stdout, bombardier: os.Stderr
+	out, err := cmd.CombinedOutput()      // go: os.Stdout, bombardier: os.Stderr
+	if errors.Is(err, exec.ErrNotFound) { // when the tool is not installed, don't panic, just return an empty string.
+		return "" // the template will omit this one. This may happen on the two optionals: dotnet and node.
+	}
 	catch(err)
 	v := strings.TrimPrefix(string(out), cmd.Args[0]+" version ")
 	v = strings.ReplaceAll(v, "\n", "")
@@ -53,6 +58,14 @@ func getToolVer(command string) string {
 	if spaceIdx := strings.IndexByte(v, ' '); spaceIdx > 0 {
 		// e.g. go1.14 windows/amd64, remove the windows/amd64 (it's already on the OS info).
 		v = v[:spaceIdx]
+	}
+
+	// If unspecified, return the default or the latest one, why?
+	// Because, when go-get the bombardier tool, and not installed by its release page
+	// then the version is not specified, this is probably a 3rd party bug-
+	// I assume because the git commit info is missing.
+	if v == "unspecified" {
+		return def
 	}
 
 	return v

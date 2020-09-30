@@ -1,7 +1,10 @@
 # ::Begin sample YAML::
 #
 # - Name: Sample Test Name
-  # Description: Stress Test Description...what it tests or what a client does and expects.
+  # Description: >
+  #  Stress Test Description...what it tests or what a client does and expects.
+  #  The description text can accept template data {{.NumberOfRequests}}
+  #  and renders as **Markdown**.            
   # NumberOfConnections: 125
   #
   # NumberOfRequests: 100000
@@ -16,8 +19,10 @@
   # URL: http://localhost:5000
   # Envs:
   #  - Repo: username/repo
+  #    Name: projectName
   #    Language: Go
   #    Dir: ./_code/sample/framework_name
+  #    Link: ./code_sample/framework_name # overrides the Repo if not empty (or Dir if Repo was empty).
   #    Exec: >-
   #      command 1
   #      command 2
