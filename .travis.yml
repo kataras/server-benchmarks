@@ -4,4 +4,4 @@ os:
   - linux
   - osx
 go:
-  - 1.15.x
+  - 1.17.x
