@@ -28,7 +28,7 @@ Depending on your test cases you may want to install [Node.js](https://nodejs.or
 ## How to run
 
 1. Navigate to your tests directory, the one which includes a  **tests.yml** file
-1. Open a temrinal and execute: `server-benchmarks`
+1. Open a terminal and execute: `server-benchmarks`
 2. Wait for the executable _server-benchmarks_ (or _server-benchmarks.exe_ for windows) to finish
 3. That's all, now open the the results from the generated **RESULTS.md** file.
 
