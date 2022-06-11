@@ -1,11 +1,11 @@
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 # Use ubuntu because of .NET Core, alpine version for latest .NET Core fails to install.
 LABEL MAINTAINER="Gerasimos (Makis) Maropoulos <kataras2006@hotmail.com>"
 RUN apt-get update && \
     apt-get install -y curl wget
 
 # Install nodejs
-RUN curl -sL https://deb.nodesource.com/setup_13.x | bash && \
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash && \
     apt-get install -y nodejs
 
 # Install .NET Core
@@ -14,9 +14,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    apt-add-repository https://packages.microsoft.com/ubuntu/18.04/prod && \
+    apt-add-repository https://packages.microsoft.com/ubuntu/22.04/prod && \
     apt-get update && \
-    apt-get install -y dotnet-sdk-3.1 && \
+    apt-get install -y dotnet-sdk-6.0 && \
     dotnet --version
 
 # Install Go
@@ -31,7 +31,7 @@ RUN mkdir -p $GOPATH/src/server-benchmarks
 RUN mkdir $GOPATH/bin
 
 # Install Bombardier
-RUN wget -O /go/bin/bombardier https://github.com/codesenberg/bombardier/releases/download/v1.2.4/bombardier-linux-amd64
+RUN wget -O /go/bin/bombardier https://github.com/codesenberg/bombardier/releases/download/v1.2.5/bombardier-linux-amd64
 RUN chmod +x /go/bin/bombardier
 
 WORKDIR /go/src/server-benchmarks
@@ -59,7 +59,7 @@ ENV GO111MODULE=on \
     GOOS=linux \
     GOARCH=amd64
 COPY go.mod .
-ENV GOPROXY=https://goproxy.cn,direct
+ENV GOPROXY=direct
 RUN go mod download
 COPY . .
 RUN go install
