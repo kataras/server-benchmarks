@@ -2,7 +2,7 @@
 
 A benchmark suite which, **transparently**, stress-tests web servers and generates a report in markdown. It measures the requests per second, data transferred and time between requests and responses.
 
-![Benchmarks: Jul 18, 2020 at 10:46am (UTC)](https://iris-go.com/images/benchmarks.svg)
+![Benchmarks: Jun 20, 2020 at 8:17pm (UTC)](https://iris-go.com/images/benchmarks.svg)
 
 ## Why YABS (Yet Another Benchmark Suite)
 
@@ -16,11 +16,11 @@ This suite can be further customized, through its [tests.yml](tests.yml) file, i
 
 ## Installation
 
-The only requirement for the benchmark tool is the [Go Programming Language](https://golang.org/dl).
+The only requirement for the benchmark tool is the [Go Programming Language](https://go.dev/dl/).
 
 ```sh
-$ go get -u github.com/kataras/server-benchmarks
-$ go get -u github.com/codesenberg/bombardier
+$ go get github.com/kataras/server-benchmarks@latest
+$ go install github.com/codesenberg/bombardier@latest
 ```
 
 Depending on your test cases you may want to install [Node.js](https://nodejs.org/en/download/current/) and [.NET Core](https://dotnet.microsoft.com/download) too.
@@ -53,7 +53,7 @@ $ docker run -v ${PWD}:/data kataras/server-benchmarks
 
 ## Benchmarks
 
-The following generated README contains benchmark results from builtin tests between popular **HTTP/2 web frameworks as of 2020**.
+The following generated README contains benchmark results from builtin tests between popular **HTTP/2 web frameworks as of 2022**.
 
 _Note:_ it's possible that the contents of this file will be updated regularly to accept even more tests cases and frameworks.
 
@@ -61,15 +61,16 @@ _Note:_ it's possible that the contents of this file will be updated regularly t
 
 |    |    |
 |----|:---|
-| Processor | Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz |
-| RAM | 15.85 GB |
-| OS | Microsoft Windows 10 Pro for Workstations |
+| Processor | AMD Ryzen 9 4900HS with Radeon Graphics          |
+| RAM | 15.42 GB |
+| OS | Microsoft Windows 11 Pro |
 | [Bombardier](https://github.com/codesenberg/bombardier) | v1.2.4 |
-| [Go](https://golang.org) | go1.14.6 |
-| [.Net Core](https://dotnet.microsoft.com/) | 3.1.102 |
-| [Node.js](https://nodejs.org/) | v14.4.0 |
+| [Go](https://golang.org) | go1.19beta1 |
+| [.Net Core](https://dotnet.microsoft.com/) | 6.0.300 |
 
-> Last updated: Jul 18, 2020 at 10:46am (UTC)
+| [Node.js](https://nodejs.org/) | v18.2.0 |
+
+> Last updated: Jun 20, 2022 at 8:17pm (UTC)
 
 ## Terminology
 
@@ -91,15 +92,15 @@ _Note:_ it's possible that the contents of this file will be updated regularly t
 
 | Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |
 |------|:---------|:---------|:--------|:-----------|:-----------------|
-| [Iris](https://github.com/kataras/iris) | Go |206880 |602.75us |36.09MB |4.84s |
-| [Gin](https://github.com/gin-gonic/gin) | Go |194837 |639.72us |34.00MB |5.13s |
-| [Kestrel](https://github.com/dotnet/aspnetcore) | C# |193333 |644.46us |32.81MB |5.17s |
-| [Chi](https://github.com/pressly/chi) | Go |187499 |664.76us |32.72MB |5.33s |
-| [Echo](https://github.com/labstack/echo) | Go |185269 |673.04us |32.33MB |5.40s |
-| [Martini](https://github.com/go-martini/martini) | Go |151410 |823.06us |26.43MB |6.60s |
-| [Koa](https://github.com/koajs/koa) | Javascript |106631 |1.16ms |21.26MB |9.28s |
-| [Express](https://github.com/expressjs/express) | Javascript |83514 |1.49ms |21.59MB |11.93s |
-| [Buffalo](https://github.com/gobuffalo/buffalo) | Go |38466 |3.25ms |6.71MB |26.00s |
+| [Iris](https://github.com/kataras/iris) | Go |284059 |438.34us |49.58MB |3.52s |
+| [Chi](https://github.com/go-chi/chi) | Go |275525 |451.01us |48.18MB |3.62s |
+| [Echo](https://github.com/labstack/echo) | Go |267815 |466.16us |46.64MB |3.74s |
+| [Kestrel](https://github.com/dotnet/aspnetcore) | C# |263479 |472.72us |44.68MB |3.80s |
+| [Gin](https://github.com/gin-gonic/gin) | Go |263399 |472.70us |45.98MB |3.80s |
+| [Martini](https://github.com/go-martini/martini) | Go |233051 |534.43us |40.68MB |4.29s |
+| [Koa](https://github.com/koajs/koa) | Javascript |131274 |0.93ms |29.24MB |7.50s |
+| [Buffalo](https://github.com/gobuffalo/buffalo) | Go |78963 |1.58ms |13.78MB |12.66s |
+| [Express](https://github.com/expressjs/express) | Javascript |41078 |3.02ms |11.54MB |24.22s |
 
 ### Test:Parameterized
 
@@ -107,31 +108,15 @@ _Note:_ it's possible that the contents of this file will be updated regularly t
 
 | Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |
 |------|:---------|:---------|:--------|:-----------|:-----------------|
-| [Iris](https://github.com/kataras/iris) | Go |193774 |643.09us |37.14MB |2.84s |
-| [Chi](https://github.com/pressly/chi) | Go |184545 |676.70us |35.32MB |2.99s |
-| [Kestrel](https://github.com/dotnet/aspnetcore) | C# |182190 |684.19us |33.87MB |3.02s |
-| [Echo](https://github.com/labstack/echo) | Go |176197 |708.66us |33.73MB |3.13s |
-| [Gin](https://github.com/gin-gonic/gin) | Go |174488 |714.74us |33.45MB |3.15s |
-| [Martini](https://github.com/go-martini/martini) | Go |145396 |0.86ms |27.88MB |3.78s |
-| [Koa](https://github.com/koajs/koa) | Javascript |88820 |1.37ms |19.46MB |6.06s |
-| [Express](https://github.com/expressjs/express) | Javascript |73546 |1.85ms |18.48MB |8.17s |
-| [Buffalo](https://github.com/gobuffalo/buffalo) | Go |37609 |3.32ms |7.21MB |14.62s |
-
-### Test:Sessions
-
-📖 Fires 250000 requests, sets a session and displays its value.
-
-| Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |
-|------|:---------|:---------|:--------|:-----------|:-----------------|
-| [Iris](https://github.com/kataras/iris) | Go |106836 |1.17ms |33.41MB |2.34s |
-| [Kestrel](https://github.com/dotnet/aspnetcore) | C# |78444 |1.60ms |36.11MB |3.20s |
-| [Echo](https://github.com/labstack/echo) | Go |73867 |1.69ms |38.28MB |3.39s |
-| [Chi](https://github.com/pressly/chi) | Go |68098 |1.83ms |35.31MB |3.67s |
-| [Martini](https://github.com/go-martini/martini) | Go |67507 |1.85ms |35.03MB |3.70s |
-| [Gin](https://github.com/gin-gonic/gin) | Go |57493 |2.18ms |24.07MB |4.36s |
-| [Koa](https://github.com/koajs/koa) | Javascript |47820 |2.79ms |20.15MB |5.60s |
-| [Express](https://github.com/expressjs/express) | Javascript |27617 |4.38ms |7.64MB |8.77s |
-| [Buffalo](https://github.com/gobuffalo/buffalo) | Go |16810 |7.45ms |24.08MB |14.90s |
+| [Iris](https://github.com/kataras/iris) | Go |277099 |449.55us |53.07MB |1.99s |
+| [Chi](https://github.com/go-chi/chi) | Go |272434 |456.62us |52.21MB |2.02s |
+| [Echo](https://github.com/labstack/echo) | Go |261467 |476.01us |50.14MB |2.10s |
+| [Gin](https://github.com/gin-gonic/gin) | Go |259308 |480.32us |49.70MB |2.12s |
+| [Kestrel](https://github.com/dotnet/aspnetcore) | C# |233843 |534.73us |43.34MB |2.36s |
+| [Martini](https://github.com/go-martini/martini) | Go |225790 |551.37us |43.29MB |2.44s |
+| [Koa](https://github.com/koajs/koa) | Javascript |114667 |1.08ms |27.21MB |4.78s |
+| [Buffalo](https://github.com/gobuffalo/buffalo) | Go |76747 |1.63ms |14.71MB |7.17s |
+| [Express](https://github.com/expressjs/express) | Javascript |37110 |3.32ms |11.11MB |14.69s |
 
 ### Test:REST
 
@@ -139,16 +124,15 @@ _Note:_ it's possible that the contents of this file will be updated regularly t
 
 | Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |
 |------|:---------|:---------|:--------|:-----------|:-----------------|
-| [Iris](https://github.com/kataras/iris) | Go |150430 |826.05us |41.25MB |1.33s |
-| [Chi](https://github.com/pressly/chi) | Go |146274 |0.85ms |39.32MB |1.37s |
-| [Gin](https://github.com/gin-gonic/gin) | Go |141664 |0.88ms |38.74MB |1.41s |
-| [Echo](https://github.com/labstack/echo) | Go |138915 |0.90ms |38.15MB |1.44s |
-| [Kestrel](https://github.com/dotnet/aspnetcore) | C# |136935 |0.91ms |39.79MB |1.47s |
-| [Martini](https://github.com/go-martini/martini) | Go |128590 |0.97ms |34.57MB |1.56s |
-| [Buffalo](https://github.com/gobuffalo/buffalo) | Go |58954 |2.12ms |16.18MB |3.40s |
-| [Koa](https://github.com/koajs/koa) | Javascript |50948 |2.61ms |14.15MB |4.19s |
-| [Express](https://github.com/expressjs/express) | Javascript |38451 |3.24ms |13.77MB |5.21s |
-
+| [Iris](https://github.com/kataras/iris) | Go |238954 |521.69us |64.15MB |0.84s |
+| [Gin](https://github.com/gin-gonic/gin) | Go |229665 |541.96us |62.86MB |0.87s |
+| [Chi](https://github.com/go-chi/chi) | Go |228072 |545.78us |62.61MB |0.88s |
+| [Echo](https://github.com/labstack/echo) | Go |224491 |553.84us |61.70MB |0.89s |
+| [Martini](https://github.com/go-martini/martini) | Go |198166 |627.46us |54.47MB |1.01s |
+| [Kestrel](https://github.com/dotnet/aspnetcore) | C# |163486 |766.90us |47.42MB |1.23s |
+| [Buffalo](https://github.com/gobuffalo/buffalo) | Go |102478 |1.22ms |28.14MB |1.95s |
+| [Koa](https://github.com/koajs/koa) | Javascript |48425 |2.56ms |15.39MB |4.14s |
+| [Express](https://github.com/expressjs/express) | Javascript |23622 |5.25ms |9.04MB |8.41s |
 
 ## License
 

@@ -292,7 +292,7 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 
 		cmd := newCmd(commandToRun)
 		cmd.Dir = env.absDir
-		// watchCmd(cmd)
+		watchCmd(cmd)
 
 		// last command should be the server, which blocks, so don't wait for it.
 		shouldWait := i < len(commandsToRun)-1

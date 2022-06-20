@@ -48,7 +48,7 @@
       Repo: dotnet/aspnetcore
       Language: "C#"
     - Repo: go-martini/martini
-    - Repo: pressly/chi
+    - Repo: go-chi/chi
     - Repo: gobuffalo/buffalo
 - Name: Parameterized
   Description: >-
@@ -69,27 +69,7 @@
       Repo: dotnet/aspnetcore
       Language: "C#"
     - Repo: go-martini/martini
-    - Repo: pressly/chi
-    - Repo: gobuffalo/buffalo
-- Name: Sessions
-  Description: >-
-     Fires {{.NumberOfRequests}} requests, sets a session and displays its value.
-  NumberOfRequests: 250000
-  Method: GET
-  URL: http://localhost:5000/sessions
-  Envs:
-    - Repo: expressjs/express
-      Language: Javascript
-    - Repo: gin-gonic/gin
-    - Repo: koajs/koa
-      Language: Javascript
-    - Repo: kataras/iris
-    - Repo: labstack/echo
-    - Name: Kestrel
-      Repo: dotnet/aspnetcore
-      Language: "C#"
-    - Repo: go-martini/martini
-    - Repo: pressly/chi
+    - Repo: go-chi/chi
     - Repo: gobuffalo/buffalo
 - Name: REST
   Description: >-
@@ -111,5 +91,5 @@
       Repo: dotnet/aspnetcore
       Language: "C#"
     - Repo: go-martini/martini
-    - Repo: pressly/chi
+    - Repo: go-chi/chi
     - Repo: gobuffalo/buffalo

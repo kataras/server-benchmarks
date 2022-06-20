@@ -31,5 +31,6 @@ func handler(ctx iris.Context) {
 func main() {
 	app := iris.New()
 	app.Post("/{id:int}", handler)
-	app.Listen(":5000", iris.WithOptimizations /* for minified JSON, the rest of frameworks do it automatically */)
+
+	app.Listen(":5000")
 }

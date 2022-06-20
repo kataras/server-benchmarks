@@ -19,6 +19,9 @@ type (
 	}
 )
 
+const contentTypeKey = "Content-Type"
+const contentTypeValue = "application/json; charset=utf-8"
+
 func handler(w http.ResponseWriter, r *http.Request, params martini.Params) {
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
@@ -32,6 +35,8 @@ func handler(w http.ResponseWriter, r *http.Request, params martini.Params) {
 		w.WriteHeader(400)
 		return
 	}
+
+	w.Header().Add(contentTypeKey, contentTypeValue)
 
 	json.NewEncoder(w).Encode(testOutput{
 		ID:   id,

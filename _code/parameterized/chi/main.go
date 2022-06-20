@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/pressly/chi"
+	"github.com/go-chi/chi/v5"
 )
 
 func main() {

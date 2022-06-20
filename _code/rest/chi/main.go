@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/pressly/chi"
+	"github.com/go-chi/chi/v5"
 )
 
 type (
@@ -18,6 +18,9 @@ type (
 		Name string `json:"name"`
 	}
 )
+
+const contentTypeKey = "Content-Type"
+const contentTypeValue = "application/json; charset=utf-8"
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
@@ -32,6 +35,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(400)
 		return
 	}
+
+	w.Header().Add(contentTypeKey, contentTypeValue)
 
 	json.NewEncoder(w).Encode(testOutput{
 		ID:   id,
