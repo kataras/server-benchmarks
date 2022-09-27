@@ -9,12 +9,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"sort"
-	"strconv"
 	"strings"
 	"text/template"
 	"time"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 const defaultLanguage = "Go"
@@ -195,7 +196,10 @@ func (e *TestEnv) GetName() string {
 		panic("invalid repo <" + e.Repo + ">")
 	}
 
-	name := strings.Title(e.Repo[idx+1:])
+	// name := strings.Title(e.Repo[idx+1:])
+	caser := cases.Title(language.English)
+	name := caser.String(e.Repo[idx+1:])
+
 	e.Name = name
 	return name
 }
@@ -300,7 +304,11 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 			err = cmd.Run()
 		} else {
 			err = cmd.Start()
-			defer killCmd(cmd)
+			defer func() {
+				if killErr := killCmd(cmd); killErr != nil {
+					fmt.Fprintf(os.Stdout, "kill: error: %v\n", killErr)
+				}
+			}()
 		}
 
 		if err != nil {
@@ -319,7 +327,7 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 	}
 
 	if err = json.NewDecoder(buf).Decode(env); err != nil {
-		return err
+		return fmt.Errorf("json decode: %w", err)
 	}
 
 	return nil
@@ -331,10 +339,8 @@ func benchmark(t *Test) error {
 			continue
 		}
 
-		time.Sleep(*waitRunDur)
-
 		if err := runBenchmark(t, env); err != nil {
-			return err
+			return fmt.Errorf("run benchmark :%w", err)
 		}
 
 		var httpErrors []string
@@ -360,6 +366,9 @@ func benchmark(t *Test) error {
 				strings.Join(httpErrors, ", "),
 			)
 		}
+
+		// fmt.Fprintf(os.Stdout, "> sleeping for %s...\n", waitRunDur.String())
+		time.Sleep(*waitRunDur)
 	}
 
 	sort.Slice(t.Envs, func(i, j int) bool {
@@ -384,29 +393,13 @@ func newCmd(command string) *exec.Cmd {
 	}
 
 	cmd := exec.Command(name, args...)
+	wrapCmd(cmd)
 	return cmd
 }
 
 func watchCmd(cmd *exec.Cmd) {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stdout
-}
-
-func killCmd(cmd *exec.Cmd) error {
-	switch runtime.GOOS {
-	case "windows":
-		err := exec.Command("taskkill", "/F", "/T", "/PID", strconv.Itoa(cmd.Process.Pid)).Run()
-		if err != nil && err.Error() != "exit status 128" {
-			return err
-		}
-
-		return nil
-	case "darwin":
-		return exec.Command("killall", "-KILL", strconv.Itoa(cmd.Process.Pid)).Run()
-	default:
-		return cmd.Process.Kill()
-		// return exec.Command("kill", "-INT", "-"+strconv.Itoa(cmd.Process.Pid)).Run()
-	}
 }
 
 func waitServer(rawURL string) (int, error) {
@@ -418,7 +411,15 @@ func waitServer(rawURL string) (int, error) {
 	maxTries := 10
 	tries := 1
 	timeout := time.Duration(2 * time.Second)
-	for tries <= maxTries {
+
+	ticker := time.NewTicker(timeout)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		if tries >= maxTries {
+			break
+		}
+
 		conn, err := net.DialTimeout("tcp4", u.Host, timeout)
 		if err == nil {
 			conn.Close()

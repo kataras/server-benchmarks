@@ -14,10 +14,11 @@ import (
 
 func writeResults(markdownFilename, spreadsheetID, googleSecretFile string, tests []*Test) error {
 	// Write results as table to the RESULTS.md file.
-	resultsMarkdownFile, err := os.Create(markdownFilename)
+	resultsMarkdownFile, err := os.OpenFile(markdownFilename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
-		return err
+		return fmt.Errorf("markdown file: %w", err)
 	}
+
 	err = rootTmpl.ExecuteTemplate(resultsMarkdownFile, "results", templateData{
 		Datetime: time.Now().UTC().Format(timeLayout),
 		System:   getSystemInfo(),
@@ -86,10 +87,12 @@ func writeResults(markdownFilename, spreadsheetID, googleSecretFile string, test
 
 func writeCSV(t *Test, header string, valueFn func(t *TestResult) string, fileSuffix string) error {
 	filename := filepath.Join(*outputDir, strings.ToLower(t.Name+fileSuffix)+".csv")
-	f, err := os.Create(filename)
+
+	f, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
-		return err
+		return fmt.Errorf("csv file: %w", err)
 	}
+
 	csvWriter := csv.NewWriter(f)
 	csvWriter.Write([]string{"Name", header})
 
@@ -106,9 +109,9 @@ func writeCSV(t *Test, header string, valueFn func(t *TestResult) string, fileSu
 }
 
 func writeReadme(filename string, tests []*Test) error {
-	readmeFile, err := os.Create(filename)
+	readmeFile, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
-		return err
+		return fmt.Errorf("readme file: %w", err)
 	}
 	defer readmeFile.Close()
 

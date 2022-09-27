@@ -47,7 +47,8 @@ func main() {
 		catch(err)
 	}
 
-	os.MkdirAll(*outputDir, os.ModeDir)
+	err = os.MkdirAll(*outputDir, 0777)
+	catch(err)
 
 	filename := filepath.Join(*outputDir, resultsMarkdownFilename)
 	err = writeResults(filename, *spreadsheetID, *googleSecretFile, tests)
