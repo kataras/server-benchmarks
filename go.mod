@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/kataras/sheets v0.0.2
 	github.com/shirou/gopsutil/v3 v3.22.9
-	golang.org/x/text v0.3.8
+	golang.org/x/text v0.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
