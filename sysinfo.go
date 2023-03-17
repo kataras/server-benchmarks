@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"os/exec"
 	"strconv"
@@ -46,11 +47,22 @@ func getSystemInfo() systemInfo {
 
 func getToolVer(command string, def string) string {
 	cmd := newCmd(command)
-	out, err := cmd.CombinedOutput()      // go: os.Stdout, bombardier: os.Stderr
-	if errors.Is(err, exec.ErrNotFound) { // when the tool is not installed, don't panic, just return an empty string.
-		return "" // the template will omit this one. This may happen on the two optionals: dotnet and node.
+	out, err := cmd.CombinedOutput() // go: os.Stdout, bombardier: os.Stderr
+	if err != nil {
+		if errors.Is(err, exec.ErrNotFound) { // when the tool is not installed, don't panic, just return an empty string.
+			return "" // the template will omit this one. This may happen on the two optionals: dotnet and node.
+		} else {
+			v := string(out)
+			if strings.HasPrefix(v, "The command could not be loaded") {
+				// The new windows 11 on dotnet --version returns a specific error when dotnet was not installed.
+				return ""
+			}
+
+			err = fmt.Errorf("command: %s\n%s\n%w", command, string(out), err)
+			catch(err)
+		}
 	}
-	catch(err)
+
 	v := strings.TrimPrefix(string(out), cmd.Args[0]+" version ")
 	v = strings.ReplaceAll(v, "\n", "")
 	v = strings.ReplaceAll(v, "\r", "")

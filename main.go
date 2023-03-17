@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -87,6 +86,6 @@ func readTests(filename string) ([]*Test, error) {
 
 func catch(err error) {
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }

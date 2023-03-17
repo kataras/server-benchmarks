@@ -19,8 +19,8 @@ This suite can be further customized, through its [tests.yml](tests.yml) file, i
 The only requirement for the benchmark tool is the [Go Programming Language](https://go.dev/dl/).
 
 ```sh
-$ go get github.com/kataras/server-benchmarks@latest
-$ go install github.com/codesenberg/bombardier@latest
+$ go get github.com/kataras/server-benchmarks@master
+$ go install github.com/codesenberg/bombardier@master
 ```
 
 Depending on your test cases you may want to install [Node.js](https://nodejs.org/en/download/current/) and [.NET Core](https://dotnet.microsoft.com/download) too.
