@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/kataras/sheets v0.0.3-0.20230315151933-d91b9f1d1bb3
 	github.com/shirou/gopsutil/v3 v3.23.6
-	golang.org/x/text v0.10.0
+	golang.org/x/text v0.11.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
