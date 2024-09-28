@@ -23,7 +23,7 @@ $ go get github.com/kataras/server-benchmarks@master
 $ go install github.com/codesenberg/bombardier@master
 ```
 
-Depending on your test cases you may want to install [Node.js](https://nodejs.org/en/download/current/) and [.NET Core](https://dotnet.microsoft.com/download) too.
+Depending on your test cases you may want to install [Node.js](https://nodejs.org/en/download/prebuilt-installer/current) and [.NET Core](https://dotnet.microsoft.com/download) too.
 
 ## How to run
 

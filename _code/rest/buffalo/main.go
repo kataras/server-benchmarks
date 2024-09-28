@@ -11,12 +11,16 @@ import (
 
 type (
 	testInput struct {
-		Email string `json:"email"`
+		Name     string  `json:"name"`
+		Language string  `json:"language"`
+		ID       string  `json:"id"`
+		Bio      string  `json:"bio"`
+		Version  float64 `json:"version"`
 	}
 
 	testOutput struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
+		ID    int `json:"id"`
+		Count int `json:"count"`
 	}
 )
 
@@ -27,14 +31,14 @@ func handler(ctx buffalo.Context) error {
 		return err
 	}
 
-	var in testInput
+	var in []testInput
 	if err := ctx.Bind(&in); err != nil {
 		return err
 	}
 
 	return ctx.Render(200, render.JSON(testOutput{
-		ID:   id,
-		Name: in.Email,
+		ID:    id,
+		Count: len(in),
 	}))
 }
 

@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net"
+	"net/http"
 	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"text/template"
@@ -34,7 +37,7 @@ type (
 		Headers             map[string]string `yaml:"Headers"`
 		Method              string            `yaml:"Method"`
 		URL                 string            `yaml:"URL"`
-		BodyFile            string            `yaml:"BodyFile"`
+		BodyFile            string            `yaml:"BodyFile"` // Directory or URL.
 	}
 
 	// TestEnv is the place at which stress-test code should be able to located, per framework.
@@ -103,6 +106,8 @@ func (t *Test) ParseDescription(tmplData interface{}) string {
 	return strings.TrimSuffix(description, "\n")
 }
 
+var downloadedFiles []string
+
 func (t *Test) buildArgs() (args []string) {
 	// default concurrent connections (this can be omitted, as it's the bombardier's default).
 	if t.NumberOfConnections == 0 {
@@ -141,6 +146,39 @@ func (t *Test) buildArgs() (args []string) {
 	}
 
 	if v := t.BodyFile; v != "" {
+		if strings.HasPrefix(v, "http") {
+			bodyFile := filepath.Join(defaultCodeDir, strings.ToLower(t.Name), "request.json")
+			if !slices.Contains(downloadedFiles, bodyFile) { // download only once.
+				// Download the file and use it as body.
+				req, err := http.NewRequest(http.MethodGet, v, nil)
+				if err != nil {
+					panic(fmt.Errorf("couldn't create request for the specified BodyFile: %s in test: %s: %w", v, t.Name, err))
+				}
+				resp, err := http.DefaultClient.Do(req)
+				if err != nil {
+					panic(fmt.Errorf("couldn't download the specified BodyFile: %s in test: %s: %w", v, t.Name, err))
+				}
+				b, err := io.ReadAll(resp.Body)
+				if err != nil {
+					panic(fmt.Errorf("couldn't read the downloaded BodyFile: %s in test: %s: %w", v, t.Name, err))
+				}
+				resp.Body.Close()
+				req = nil
+				resp = nil
+
+				// This doesn't work if the file is large, so we need to store it first.
+				// args = append(args, []string{"-b", string(b)}...)
+
+				// Store the file and use it as body.
+
+				if err := os.WriteFile(bodyFile, b, 0644); err != nil {
+					panic(fmt.Errorf("couldn't write the downloaded BodyFile: %s in test: %s: %w", v, t.Name, err))
+				}
+				downloadedFiles = append(downloadedFiles, bodyFile)
+			}
+			v = bodyFile // change the parameter here to the file path.
+		}
+
 		args = append(args, []string{"-f", v}...)
 
 		// try to fill the content type if missing.
@@ -264,7 +302,7 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 		var execCommand string
 		switch lang := strings.ToLower(env.Language); lang {
 		case "go", "golang":
-			execCommand = "go run main.go"
+			execCommand = "go run ."
 		case "csharp", "c#", "net", ".net", "aspnetcore", "kestrel", "netcore", "net.core", ".net core":
 			execCommand = "dotnet run -c Release"
 		case "node", "nodejs", "javascript", "js":
@@ -278,6 +316,7 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 
 	// build the bench command before server ran.
 	args := t.buildArgs()
+
 	bombardierCommand := "bombardier " + strings.Join(args, " ") // for logging.
 
 	benchCmd := exec.Command("bombardier", args...)

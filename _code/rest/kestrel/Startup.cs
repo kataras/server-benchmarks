@@ -2,20 +2,26 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace netcore
 {
     public struct testInput
     {
-        public string email { get; set; }
+        public string Name { get; set; }
+        public string Language { get; set; }
+        public string Id { get; set; }
+        public string Bio { get; set; }
+        public double Version { get; set; }
     }
 
     public struct testOutput
     {
         public int id { get; set; }
-        public string name { get; set; }
+        public int count { get; set; }
     }
 
     public class Startup
@@ -34,8 +40,13 @@ namespace netcore
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.Use(async (context, next) =>
+            {
+                context.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize = 10 * 1024 *1024 ; // 2MB limit.
+                await next.Invoke();
+            });
             var routeBuilder = new RouteBuilder(app);
-            routeBuilder.MapPost("/{id}", context =>
+            routeBuilder.MapPost("/{id}", async context =>
             {
                 // Follow: https://www.youtube.com/watch?v=gb3zcdZ-y3M
                 // https://devblogs.microsoft.com/dotnet/try-the-new-system-text-json-apis/
@@ -44,22 +55,18 @@ namespace netcore
                 // So we use that for our bencharks
                 // (remember: as fast as possible so we can have real competitors,
                 // even if the code does not look as nice as the Iris' one for example). 
-                var input = JsonSerializer.DeserializeAsync<testInput>(context.Request.Body).Result;
+                var inputs = await JsonSerializer.DeserializeAsync<List<testInput>>(context.Request.Body);
 
                 var output = new testOutput
                 {
-                    // output.id = (int) context.GetRouteValue ("id"); produces:
-                    // Unable to cast object of type 'System.String' to type 'System.Int32'.
-                    // Another disadvantage, in Iris you could get the value as defined in routing,
-                    // e.g. {id:int} without convert it again and again.... Anyway
                     id = int.Parse(context.GetRouteValue("id").ToString()),
-                    name = input.email
+                    count = inputs.Count
                 };
 
                 context.Response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-                // default json options: minified output.
-                return JsonSerializer.SerializeAsync(context.Response.Body, output);
+                await JsonSerializer.SerializeAsync(context.Response.Body, output);
             });
+
             var routes = routeBuilder.Build();
             app.UseRouter(routes);
         }

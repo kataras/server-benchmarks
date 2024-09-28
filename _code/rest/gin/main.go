@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -8,16 +9,22 @@ import (
 
 type (
 	testInput struct {
-		Email string `json:"email"`
+		Name     string  `json:"name"`
+		Language string  `json:"language"`
+		ID       string  `json:"id"`
+		Bio      string  `json:"bio"`
+		Version  float64 `json:"version"`
 	}
 
 	testOutput struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
+		ID    int `json:"id"`
+		Count int `json:"count"`
 	}
 )
 
 func handler(ctx *gin.Context) {
+	ctx.Request.Body = http.MaxBytesReader(ctx.Writer, ctx.Request.Body, 2<<20) // 2MB.
+
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		// * Gin does not support parameter type-based routing.
@@ -25,15 +32,15 @@ func handler(ctx *gin.Context) {
 		return
 	}
 
-	var in testInput
+	var in []testInput
 	if err := ctx.BindJSON(&in); err != nil {
 		ctx.Status(400)
 		return
 	}
 
 	ctx.JSON(200, testOutput{
-		ID:   id,
-		Name: in.Email,
+		ID:    id,
+		Count: len(in),
 	})
 }
 

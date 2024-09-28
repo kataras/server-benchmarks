@@ -12,6 +12,13 @@ import (
 func wrapCmd(cmd *exec.Cmd) {}
 
 func killCmd(cmd *exec.Cmd) error {
+	if cmd == nil {
+		return nil
+	}
+	if cmd.Process == nil {
+		return nil
+	}
+
 	switch runtime.GOOS {
 	case "windows":
 		err := exec.Command("taskkill", "/F", "/T", "/PID", strconv.Itoa(cmd.Process.Pid)).Run()

@@ -1,6 +1,6 @@
 module static_martini
 
-go 1.19
+go 1.23
 
 require github.com/go-martini/martini v0.0.0-20170121215854-22fa46961aab
 

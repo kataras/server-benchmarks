@@ -1,10 +1,13 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -20,6 +23,7 @@ const (
 var (
 	waitRunDur         = flag.Duration("wait-run", 3*time.Second, "wait time between tests")
 	testsFile          = flag.String("i", "./tests.yml", "yaml file path contains the tests to run")
+	specificTest       = flag.String("t", "", "run only a specific test by its name")
 	outputDir          = flag.String("o", "./", "directory to save generaged Markdown and CSV files")
 	enableREADMEOutput = flag.Bool("readme", false, "to generate a README.md file near the RESULTS.md")
 	spreadsheetID      = flag.String("g-spreadsheet", "", "Google Spreadsheet ID to send results")
@@ -40,11 +44,18 @@ func main() {
 	tests, err := readTests(*testsFile)
 	catch(err)
 
+	if specificTestName := strings.ToLower(*specificTest); specificTestName != "" {
+		tests = slices.DeleteFunc(tests, func(t *Test) bool {
+			return strings.ToLower(t.Name) != specificTestName
+		})
+	}
+
 	// TESTS
 	for _, t := range tests {
 		err = benchmark(t)
 		catch(err)
 	}
+	cleanup()
 
 	err = os.MkdirAll(*outputDir, 0777)
 	catch(err)
@@ -84,8 +95,20 @@ func readTests(filename string) ([]*Test, error) {
 	return tests, nil
 }
 
+func cleanup() {
+	for i, f := range downloadedFiles {
+		if err := os.Remove(f); err != nil && !errors.Is(err, os.ErrNotExist) {
+			fmt.Fprintf(os.Stdout, "remove: %v\n", err)
+		}
+
+		// delete slice element.
+		downloadedFiles = append(downloadedFiles[:i], downloadedFiles[i+1:]...)
+	}
+}
+
 func catch(err error) {
 	if err != nil {
+		cleanup()
 		panic(err)
 	}
 }

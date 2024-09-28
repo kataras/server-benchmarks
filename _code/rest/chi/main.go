@@ -10,12 +10,16 @@ import (
 
 type (
 	testInput struct {
-		Email string `json:"email"`
+		Name     string  `json:"name"`
+		Language string  `json:"language"`
+		ID       string  `json:"id"`
+		Bio      string  `json:"bio"`
+		Version  float64 `json:"version"`
 	}
 
 	testOutput struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
+		ID    int `json:"id"`
+		Count int `json:"count"`
 	}
 )
 
@@ -23,6 +27,8 @@ const contentTypeKey = "Content-Type"
 const contentTypeValue = "application/json; charset=utf-8"
 
 func handler(w http.ResponseWriter, r *http.Request) {
+	r.Body = http.MaxBytesReader(w, r.Body, 2<<20) // 2MB.
+
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		// * Chi does not support parameter type-based routing.
@@ -30,7 +36,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var in testInput
+	var in []testInput
 	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
 		w.WriteHeader(400)
 		return
@@ -39,8 +45,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add(contentTypeKey, contentTypeValue)
 
 	json.NewEncoder(w).Encode(testOutput{
-		ID:   id,
-		Name: in.Email,
+		ID:    id,
+		Count: len(in),
 	})
 }
 

@@ -34,6 +34,7 @@
 - Name: Static
   Description: Fires {{.NumberOfRequests}} requests, receives a static message as response.
   NumberOfRequests: 1000000
+  # Duration: 5s
   Method: GET
   URL: http://localhost:5000
   Envs:
@@ -43,6 +44,8 @@
     - Repo: koajs/koa
       Language: Javascript
     - Repo: kataras/iris
+    # - Repo: kataras/iris-private
+    #   Dir: ./_code/static/iris-next
     - Repo: labstack/echo
     - Name: Kestrel
       Repo: dotnet/aspnetcore
@@ -55,6 +58,7 @@
      Fires {{.NumberOfRequests}} requests with a dynamic parameter of string,
      receives a hello text based on the parameter as response.
   NumberOfRequests: 550000
+  # Duration: 5s
   Method: GET
   URL: http://localhost:5000/hello/world
   Envs:
@@ -64,6 +68,8 @@
     - Repo: koajs/koa
       Language: Javascript
     - Repo: kataras/iris
+    # - Repo: kataras/iris-private
+    #   Dir: ./_code/parameterized/iris-next
     - Repo: labstack/echo
     - Name: Kestrel
       Repo: dotnet/aspnetcore
@@ -76,8 +82,10 @@
       Fires {{.NumberOfRequests}} requests with a dynamic parameter of int,
       sends JSON as request body and receives JSON as response.
   NumberOfRequests: 200000
+  # Duration: 5s
   Method: POST
-  BodyFile: ./_code/rest/request.json
+  # BodyFile: ./_code/rest/request.json
+  BodyFile: "https://microsoftedge.github.io/Demos/json-dummy-data/1MB.json"
   URL: http://localhost:5000/42
   Envs:
     - Repo: expressjs/express
@@ -86,6 +94,8 @@
     - Repo: koajs/koa
       Language: Javascript
     - Repo: kataras/iris
+    # - Repo: kataras/iris-private
+    #   Dir: ./_code/rest/iris-next
     - Repo: labstack/echo
     - Name: Kestrel
       Repo: dotnet/aspnetcore

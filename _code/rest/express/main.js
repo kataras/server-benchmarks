@@ -8,14 +8,15 @@ createWorker(createWebServer) // multi-thread.
 
 function createWebServer() {
     const app = express();
-    app.use(express.json()); // express v4.16+.
+    app.use(express.json({limit: '2mb'})); // express v4.16+.
+    app.use(express.urlencoded({limit: '2mb'}));
 
     app.post('/:id', function (req, res) {
         const id = parseInt(req.params.id);
-        const input = req.body;
+        const inputs = req.body;
         res.json({
             id: id,
-            name: input.email,
+            count: inputs.length
         });
     });
 
