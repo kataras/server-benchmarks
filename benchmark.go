@@ -33,7 +33,7 @@ type (
 		NumberOfConnections uint64            `yaml:"NumberOfConnections"` // defaults to 125.
 		NumberOfRequests    uint64            `yaml:"NumberOfRequests"`
 		Duration            time.Duration     `yaml:"Duration"`
-		Timeout             time.Duration     `yaml:"Timeout"` // defaults to 2s
+		Timeout             time.Duration     `yaml:"Timeout"` // defaults to 15s
 		Headers             map[string]string `yaml:"Headers"`
 		Method              string            `yaml:"Method"`
 		URL                 string            `yaml:"URL"`
@@ -114,9 +114,9 @@ func (t *Test) buildArgs() (args []string) {
 		t.NumberOfConnections = 125
 	}
 
-	// default timeout to 2 seconds (this can be omitted, as it's the bombardier's default).
+	// default timeout to 15 seconds (this can be omitted, as it's the bombardier's default).
 	if t.Timeout == 0 {
-		t.Timeout = 2 * time.Second
+		t.Timeout = 15 * time.Second
 	}
 
 	// if not number of requests to fire defined and not a test duration,
@@ -373,6 +373,10 @@ func runBenchmark(t *Test, env *TestEnv) (err error) {
 }
 
 func benchmark(t *Test) error {
+	if len(t.Envs) == 0 {
+		return nil
+	}
+
 	for _, env := range t.Envs {
 		if !env.CanBenchmark() {
 			continue

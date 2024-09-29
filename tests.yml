@@ -11,7 +11,7 @@
   # or
   # Duration: 5s
   #
-  # Timeout: 2s
+  # Timeout: 15s
   # Method: POST
   # BodyFile: ./request_payload.json
   # Headers:

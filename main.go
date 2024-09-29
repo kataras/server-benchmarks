@@ -23,7 +23,6 @@ const (
 var (
 	waitRunDur         = flag.Duration("wait-run", 3*time.Second, "wait time between tests")
 	testsFile          = flag.String("i", "./tests.yml", "yaml file path contains the tests to run")
-	specificTest       = flag.String("t", "", "run only a specific test by its name")
 	outputDir          = flag.String("o", "./", "directory to save generaged Markdown and CSV files")
 	enableREADMEOutput = flag.Bool("readme", false, "to generate a README.md file near the RESULTS.md")
 	spreadsheetID      = flag.String("g-spreadsheet", "", "Google Spreadsheet ID to send results")
@@ -35,6 +34,8 @@ var (
 
 // server-benchmarks --wait-run=3s -i ./tests.dev.yml -o ./dev -g-spreadsheet $GoogleSpreadsheetID -g-secret client_secret.json
 func main() {
+	var specificTests stringSlice
+	flag.Var(&specificTests, "t", "run only specific tests by their names") // support multiple -t flags.
 	flag.Parse()
 
 	if _, err := os.Stat("/.dockerenv"); err == nil || os.IsExist(err) {
@@ -44,11 +45,7 @@ func main() {
 	tests, err := readTests(*testsFile)
 	catch(err)
 
-	if specificTestName := strings.ToLower(*specificTest); specificTestName != "" {
-		tests = slices.DeleteFunc(tests, func(t *Test) bool {
-			return strings.ToLower(t.Name) != specificTestName
-		})
-	}
+	tests = filterTests(specificTests, tests...)
 
 	// TESTS
 	for _, t := range tests {
@@ -93,6 +90,39 @@ func readTests(filename string) ([]*Test, error) {
 	}
 
 	return tests, nil
+}
+
+func filterTests(specificTests stringSlice, tests ...*Test) []*Test {
+	testsAndEnvsToKeep := make(map[string][]string, len(specificTests))
+	for _, specificTest := range specificTests {
+		if specificTestName := strings.ToLower(specificTest); specificTestName != "" {
+			specificTestEnvName := ""
+			if dotParts := strings.Split(specificTestName, "."); len(dotParts) > 1 {
+				specificTestName = strings.Join(dotParts[0:len(dotParts)-1], ".") // name all except last dot.
+				specificTestEnvName = dotParts[len(dotParts)-1]
+			}
+			testsAndEnvsToKeep[specificTestName] = append(testsAndEnvsToKeep[specificTestName], specificTestEnvName)
+		}
+	}
+
+	// Delete all tests and envs that are not in the specificTests list.
+	return slices.DeleteFunc(tests, func(t *Test) bool {
+		// keep only the specific test.
+		testName := strings.ToLower(t.Name)
+		if specificTestEnvNames, ok := testsAndEnvsToKeep[testName]; ok {
+			// keep only the specific test's environment.
+			// E.g. -t rest.iris -t rest.iris-private
+			if len(specificTestEnvNames) > 0 {
+				t.Envs = slices.DeleteFunc(t.Envs, func(e *TestEnv) bool {
+					return !slices.Contains(specificTestEnvNames, strings.ToLower(e.GetName()))
+				})
+			}
+
+			return false
+		}
+
+		return true
+	})
 }
 
 func cleanup() {

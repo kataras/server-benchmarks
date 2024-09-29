@@ -8,3 +8,4 @@ tests.dev.yml
 dev
 client_secret.json
 binaries
+_code/rest/request.json
