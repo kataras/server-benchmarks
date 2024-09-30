@@ -22,6 +22,7 @@ namespace netcore
     {
         public int id { get; set; }
         public int count { get; set; }
+        public string first_id { get; set; }
     }
 
     public class Startup
@@ -60,7 +61,8 @@ namespace netcore
                 var output = new testOutput
                 {
                     id = int.Parse(context.GetRouteValue("id").ToString()),
-                    count = inputs.Count
+                    count = inputs.Count,
+                    first_id = inputs[0].Id 
                 };
 
                 context.Response.Headers.Add("Content-Type", "application/json; charset=utf-8");

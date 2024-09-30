@@ -16,7 +16,8 @@ function createWebServer() {
         const inputs = req.body;
         res.json({
             id: id,
-            count: inputs.length
+            count: inputs.length,
+            first_id: inputs[0].id
         });
     });
 

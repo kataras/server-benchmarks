@@ -93,6 +93,10 @@ func readTests(filename string) ([]*Test, error) {
 }
 
 func filterTests(specificTests stringSlice, tests ...*Test) []*Test {
+	if len(specificTests) == 0 {
+		return tests
+	}
+
 	testsAndEnvsToKeep := make(map[string][]string, len(specificTests))
 	for _, specificTest := range specificTests {
 		if specificTestName := strings.ToLower(specificTest); specificTestName != "" {

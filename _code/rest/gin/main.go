@@ -17,8 +17,9 @@ type (
 	}
 
 	testOutput struct {
-		ID    int `json:"id"`
-		Count int `json:"count"`
+		ID      int    `json:"id"`
+		Count   int    `json:"count"`
+		FirstID string `json:"first_id"`
 	}
 )
 
@@ -39,8 +40,9 @@ func handler(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, testOutput{
-		ID:    id,
-		Count: len(in),
+		ID:      id,
+		Count:   len(in),
+		FirstID: in[0].ID,
 	})
 }
 

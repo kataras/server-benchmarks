@@ -18,6 +18,7 @@ function createWebServer() {
         ctx.body = {
             id: id,
             count: inputs.length,
+            first_id: inputs[0].id
         };
     });
 
