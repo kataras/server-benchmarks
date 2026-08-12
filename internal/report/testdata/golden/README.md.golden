@@ -1,0 +1,113 @@
+# Server Benchmarks
+
+A benchmark suite which, transparently, stress-tests web servers and generates reports in Markdown, CSV, JSON and SVG charts. It measures requests per second, latency, data transfer and total completion time.
+
+## Why
+
+Most benchmark suites don't test real-life applications. This suite runs each framework's application as a self-contained program and measures it with a trusted third-party HTTP load generator, [bombardier](https://github.com/codesenberg/bombardier), which acts as a real HTTP client — one more reason of transparency. [Contributions](CONTRIBUTING.md) and improvements are always welcome.
+
+## Installation
+
+The only requirement for the benchmark tool itself is the [Go Programming Language](https://go.dev/dl/).
+
+```sh
+go install github.com/kataras/server-benchmarks@latest
+go install github.com/codesenberg/bombardier@latest
+```
+
+Depending on the test cases you run, you may also need [Node.js](https://nodejs.org/) and the [.NET SDK](https://dotnet.microsoft.com/download).
+
+## How to run
+
+1. Navigate to the directory that contains your **tests.yml** file
+2. Run `server-benchmarks`
+3. Open the generated **RESULTS.md** file
+
+Useful variants:
+
+```sh
+# run only specific tests or environments:
+server-benchmarks run -t rest -t static.iris
+
+# custom spec file, output directory and settle time between runs:
+server-benchmarks run -i ./tests.dev.yml -o ./dev -wait-run 3s
+
+# list the tests of a spec without running anything:
+server-benchmarks list
+
+# re-render the reports (Markdown, CSV, SVG) of a previous run:
+server-benchmarks export -i ./results.json -o ./
+```
+
+### Run using Docker
+
+```sh
+docker build -t server-benchmarks .
+docker run --rm -v ${PWD}:/data server-benchmarks
+```
+
+## Benchmarks
+
+## System
+
+|    |    |
+|----|:---|
+| Processor | Snapdragon X Elite X1E80100 |
+| RAM | 31.69 GB |
+| OS | Microsoft Windows 11 Home |
+| [Bombardier](https://github.com/codesenberg/bombardier) | v2.0.2 |
+| [Go](https://go.dev) | go1.26.5 |
+| [.NET](https://dotnet.microsoft.com/) | 10.0.100 |
+| [Node.js](https://nodejs.org/) | v24.4.1 |
+
+> Last updated: Aug 12, 2026 at 2:30pm (UTC)
+
+## Terminology
+
+**Name** is the name of the framework (or router) used under a particular test.
+
+**Reqs/sec** is the average number of requests processed per second (the higher the better).
+
+**Latency** is the time from when a request is made by the client until the response gets back to that client (the lower the better).
+
+**Throughput** is the rate at which data is transferred (the higher the better; it depends on the response length, body plus headers).
+
+**Time To Complete** is the total time the test took to complete (the lower the better).
+
+## Results
+
+### Test: Static
+
+📖 Fires 100000 requests, receives a static message as response.
+
+![Static: requests per second](static.svg)
+
+![Static: latency](static_latency.svg)
+
+| Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |
+|------|:---------|:---------|:--------|:-----------|:-----------------|
+| [Iris](https://github.com/kataras/iris) | Go | 284059 | 438.94us | 51.47MB | 0.35s |
+| [Fastify](https://github.com/fastify/fastify) | Javascript | 180010 | 690.12us | 32.62MB | 0.56s |
+| [ASP.NET Core](https://github.com/dotnet/aspnetcore) | C# | 150001 | 830.77us | 27.18MB | 0.67s |
+| Iris (next) | Go | 120044 | 0.99ms | 21.75MB | 0.83s |
+| [Gin](https://github.com/gin-gonic/gin) | Go | - | - | - | - |
+| [Koa](https://github.com/koajs/koa) | Javascript | - | - | - | - |
+
+> ⚠️ **Gin**: Static: Gin: 5 non-successful responses [2xx: 99995, 3xx: 0, 4xx: 5, 5xx: 0, others: 0]
+
+### Test: REST
+
+📖 Fires 100000 requests with a 1MB JSON body.
+
+![REST: requests per second](rest.svg)
+
+![REST: latency](rest_latency.svg)
+
+| Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |
+|------|:---------|:---------|:--------|:-----------|:-----------------|
+| [Iris](https://github.com/kataras/iris) | Go | 238954 | 520.33us | 43.30MB | 0.42s |
+| [Fastify](https://github.com/fastify/fastify) | Javascript | 160124 | 780.45us | 29.01MB | 0.62s |
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

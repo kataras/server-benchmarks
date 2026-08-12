@@ -2,28 +2,114 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, main]
   pull_request:
-    branches: [master]
+    branches: [master, main]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: 1.26.x
+      - name: Check gofmt
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "gofmt needed on:"; echo "$unformatted"; exit 1
+          fi
+      - run: go vet ./...
+      - name: staticcheck
+        run: go run honnef.co/go/tools/cmd/staticcheck@latest ./...
 
   test:
-    name: Test
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        go_version: [1.23.x]
     steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: 1.26.x
+      - run: go build ./...
+      - run: go test -race ./...
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v5
-      with:
-        go-version: ${{ matrix.go_version }}
+  crosscompile:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { goos: linux, goarch: "386" }
+          - { goos: linux, goarch: arm }
+          - { goos: linux, goarch: s390x }
+          - { goos: windows, goarch: "386" }
+          - { goos: darwin, goarch: arm64 }
+          - { goos: freebsd, goarch: amd64 }
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: 1.26.x
+      - run: go build ./...
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v4
+  govulncheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: 1.26.x
+      - run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 
-    - name: Test
-      run: go test -v ./...
+  # The _code benchmark apps live in an underscore directory, invisible to
+  # `go build ./...` — these jobs keep them compiling.
+  apps-go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: 1.26.x
+          cache-dependency-path: _code/**/go.sum
+      - name: Build and vet every Go app
+        run: |
+          set -e
+          for m in $(find _code -name go.mod); do
+            d=$(dirname "$m")
+            echo "== $d"
+            (cd "$d" && go build ./... && go vet ./...)
+          done
+
+  apps-node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install and syntax-check every Node app
+        run: |
+          set -e
+          for d in _code/*/express _code/*/koa _code/*/fastify; do
+            echo "== $d"
+            (cd "$d" && npm ci --no-fund --no-audit && node --check main.js)
+          done
+
+  apps-dotnet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Build every .NET app
+        run: |
+          set -e
+          for p in $(find _code -name '*.csproj'); do
+            echo "== $p"
+            dotnet build -c Release "$p"
+          done

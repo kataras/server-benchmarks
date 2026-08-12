@@ -1,105 +1,120 @@
-# ::Begin sample YAML::
+# ::Schema::
 #
-# - Name: Sample Test Name
-  # Description: >
-  #  Stress Test Description...what it tests or what a client does and expects.
-  #  The description text can accept template data {{.NumberOfRequests}}
-  #  and renders as **Markdown**.            
-  # NumberOfConnections: 125
-  #
-  # NumberOfRequests: 100000
-  # or
-  # Duration: 5s
-  #
-  # Timeout: 15s
-  # Method: POST
-  # BodyFile: ./request_payload.json
-  # Headers:
-  #  Key: Value
-  # URL: http://localhost:5000
-  # Envs:
-  #  - Repo: username/repo
-  #    Name: projectName
-  #    Language: Go
-  #    Dir: ./_code/sample/framework_name
-  #    Link: ./code_sample/framework_name # overrides the Repo if not empty (or Dir if Repo was empty).
-  #    Exec: >-
-  #      command 1
-  #      command 2
-  #      go run main.go
-  #    or
-  #    NotSupported: true
+# - Name: Sample Test Name           # required, unique.
+#   Description: >-                  # rendered as Markdown in the reports; may
+#     Fires {{.NumberOfRequests}}    # reference the test itself as template data.
+#     requests.
+#   NumberOfConnections: 125         # concurrent connections (default 125).
+#   NumberOfRequests: 100000         # either this or a Duration (e.g. 5s).
+#   # Duration: 5s
+#   Timeout: 15s                     # per-request timeout (default 15s).
+#   Method: POST                     # HTTP method (default GET).
+#   BodyFile: ./request_payload.json # local path or URL; URLs are downloaded
+#                                    # once per test and cleaned up afterwards.
+#   Headers:                         # extra headers; for POST/PUT with a
+#     Key: Value                     # BodyFile, Content-Type is inferred from
+#                                    # the file extension when missing.
+#   URL: http://localhost:5000       # every server must listen on this address.
+#   Envs:                            # one entry per framework:
+#     - Repo: username/repo          # display name derives from the repo
+#                                    # (kataras/iris -> "Iris") unless Name is set.
+#       Name: Display Name           # optional override; required when there is
+#                                    # no public Repo (private/local code bases).
+#       Language: Go                 # Go (default), Javascript or C#; selects the
+#                                    # default Exec commands.
+#       Dir: ./_code/sample/name     # default: ./_code/<test>/<lowercase name>.
+#                                    # May be an absolute path anywhere on disk.
+#       Exec: |-                     # optional override, one command per line;
+#         go build -o app .          # the last line must be the blocking server.
+#         ./app
+#       NotSupported: true           # or NotYetImplemented: true — the env is
+#                                    # listed in the reports but not benchmarked.
 #
-# ::End sample YAML::
+# To benchmark a private or unreleased framework, point an env at any local
+# directory — no public repository needed:
+#
+#     - Name: Iris (next)
+#       Dir: C:/github/iris-private/_benchmarks/static
+#
+# or copy an app (e.g. ./_code/static/iris) next to it and add a go.mod
+# replace directive: replace github.com/kataras/iris/v12 => C:/github/iris-private
+#
+# ::End schema::
 - Name: Static
   Description: Fires {{.NumberOfRequests}} requests, receives a static message as response.
   NumberOfRequests: 100000
-  # Duration: 5s
   Method: GET
   URL: http://localhost:5000
   Envs:
+    - Repo: kataras/iris
+    - Repo: gin-gonic/gin
+    - Repo: labstack/echo
+    - Repo: go-chi/chi
+    - Repo: gofiber/fiber
+    - Name: net/http
+      Repo: golang/go
+      Dir: ./_code/static/nethttp
     - Repo: expressjs/express
       Language: Javascript
-    - Repo: gin-gonic/gin
     - Repo: koajs/koa
       Language: Javascript
-    - Repo: kataras/iris
-    # - Repo: kataras/iris-private
-    #   Dir: ./_code/static/iris-next
-    - Repo: labstack/echo
-    - Name: Kestrel
+    - Repo: fastify/fastify
+      Language: Javascript
+    - Name: ASP.NET Core
       Repo: dotnet/aspnetcore
       Language: "C#"
-    - Repo: go-martini/martini
-    - Repo: go-chi/chi
-    - Repo: gobuffalo/buffalo
+      Dir: ./_code/static/aspnetcore
 - Name: Parameterized
   Description: >-
-     Fires {{.NumberOfRequests}} requests with a dynamic parameter of string,
-     receives a hello text based on the parameter as response.
+    Fires {{.NumberOfRequests}} requests with a dynamic parameter of string,
+    receives a hello text based on the parameter as response.
   NumberOfRequests: 100000
-  # Duration: 5s
   Method: GET
   URL: http://localhost:5000/hello/world
   Envs:
+    - Repo: kataras/iris
+    - Repo: gin-gonic/gin
+    - Repo: labstack/echo
+    - Repo: go-chi/chi
+    - Repo: gofiber/fiber
+    - Name: net/http
+      Repo: golang/go
+      Dir: ./_code/parameterized/nethttp
     - Repo: expressjs/express
       Language: Javascript
-    - Repo: gin-gonic/gin
     - Repo: koajs/koa
       Language: Javascript
-    # - Repo: kataras/iris
-    # - Repo: kataras/iris-private
-      Dir: ./_code/parameterized/iris-next
-    - Repo: labstack/echo
-    - Name: Kestrel
+    - Repo: fastify/fastify
+      Language: Javascript
+    - Name: ASP.NET Core
       Repo: dotnet/aspnetcore
       Language: "C#"
-    - Repo: go-martini/martini
-    - Repo: go-chi/chi
-    - Repo: gobuffalo/buffalo
+      Dir: ./_code/parameterized/aspnetcore
 - Name: REST
   Description: >-
-      Fires {{.NumberOfRequests}} requests with a dynamic parameter of int,
-      sends 1MB JSON as request body and receives JSON as response.
+    Fires {{.NumberOfRequests}} requests with a dynamic parameter of int,
+    sends 1MB JSON as request body and receives JSON as response.
   NumberOfRequests: 100000
-  # Duration: 8s
   Method: POST
   # BodyFile: ./_code/rest/request.json
   BodyFile: "https://microsoftedge.github.io/Demos/json-dummy-data/1MB.json"
   URL: http://localhost:5000/42
   Envs:
+    - Repo: kataras/iris
+    - Repo: gin-gonic/gin
+    - Repo: labstack/echo
+    - Repo: go-chi/chi
+    - Repo: gofiber/fiber
+    - Name: net/http
+      Repo: golang/go
+      Dir: ./_code/rest/nethttp
     - Repo: expressjs/express
       Language: Javascript
-    - Repo: gin-gonic/gin
     - Repo: koajs/koa
       Language: Javascript
-    - Repo: kataras/iris
-    # - Repo: kataras/iris-private
-    #   Dir: ./_code/rest/iris-next
-    - Repo: labstack/echo
-    - Name: Kestrel
+    - Repo: fastify/fastify
+      Language: Javascript
+    - Name: ASP.NET Core
       Repo: dotnet/aspnetcore
       Language: "C#"
-    - Repo: go-martini/martini
-    - Repo: go-chi/chi
-    - Repo: gobuffalo/buffalo
+      Dir: ./_code/rest/aspnetcore

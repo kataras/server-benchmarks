@@ -1,72 +1,75 @@
-FROM ubuntu:22.04
-# Use ubuntu because of .NET Core, alpine version for latest .NET Core fails to install.
-LABEL MAINTAINER="Gerasimos (Makis) Maropoulos <kataras2006@hotmail.com>"
-RUN apt-get update && \
-    apt-get install -y curl wget
+# The image carries every runtime the benchmark apps need (Go, Node.js,
+# .NET SDK) plus the bombardier load generator — the apps are started with
+# `go run` / `node` / `dotnet run` at benchmark time, so a multi-stage
+# build would gain nothing here.
+FROM ubuntu:24.04
 
-# Install nodejs
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash && \
-    apt-get install -y nodejs
+ARG TARGETARCH=amd64
+ARG GO_VERSION=1.26.5
+ARG NODE_MAJOR=24
+ARG DOTNET_CHANNEL=10.0
+ARG BOMBARDIER_VERSION=v2.0.2
 
-# Install .NET Core
-RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    rm -rf /var/lib/apt/lists/*
+LABEL org.opencontainers.image.title="server-benchmarks" \
+      org.opencontainers.image.description="Benchmarks between HTTP web frameworks" \
+      org.opencontainers.image.source="https://github.com/kataras/server-benchmarks" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.authors="Gerasimos (Makis) Maropoulos <contact@hellenic.dev>"
 
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    apt-add-repository https://packages.microsoft.com/ubuntu/22.04/prod && \
-    apt-get update && \
-    apt-get install -y dotnet-sdk-6.0 && \
-    dotnet --version
+ENV DEBIAN_FRONTEND=noninteractive \
+    DOTNET_CLI_TELEMETRY_OPTOUT=1 \
+    DOTNET_NOLOGO=1
 
-# Install Go
-RUN add-apt-repository ppa:longsleep/golang-backports && \
-    apt update && \
-    apt install -y golang-go
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates curl git \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV GOPATH="/go"
-ENV PATH="/go/bin:${PATH}"
+# Node.js LTS (NodeSource).
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/* \
+    && node --version
 
-RUN mkdir -p $GOPATH/src/server-benchmarks
-RUN mkdir $GOPATH/bin
+# .NET SDK via the official install script (the Microsoft apt feed is
+# being phased out and lags behind on Ubuntu).
+RUN curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- \
+        --channel ${DOTNET_CHANNEL} --install-dir /usr/share/dotnet \
+    && ln -s /usr/share/dotnet/dotnet /usr/local/bin/dotnet \
+    && dotnet --version
 
-# Install Bombardier
-RUN wget -O /go/bin/bombardier https://github.com/codesenberg/bombardier/releases/download/v1.2.5/bombardier-linux-amd64
-RUN chmod +x /go/bin/bombardier
+# Go, from the official tarball (pinned; distro packages lag).
+RUN curl -fsSL https://go.dev/dl/go${GO_VERSION}.linux-${TARGETARCH}.tar.gz | tar -C /usr/local -xz
+ENV PATH="/usr/local/go/bin:/root/go/bin:${PATH}"
 
-WORKDIR /go/src/server-benchmarks
-# Cache node modules
-#
-# static test
-COPY ./_code/static/express/package.json ./_code/static/express/package.json
-RUN cd ./_code/static/express && npm install
-COPY ./_code/static/koa/package.json ./_code/static/koa/package.json
-RUN cd ./_code/static/koa && npm install
-# parameterized test
-COPY ./_code/parameterized/express/package.json ./_code/parameterized/express/package.json
-RUN cd ./_code/parameterized/express && npm install
-COPY ./_code/parameterized/koa/package.json ./_code/parameterized/koa/package.json
-RUN cd ./_code/parameterized/koa && npm install
-# rest test
-COPY ./_code/rest/express/package.json ./_code/rest/express/package.json
-RUN cd ./_code/rest/express && npm install
-COPY ./_code/rest/koa/package.json ./_code/rest/koa/package.json
-RUN cd ./_code/rest/koa && npm install
+# Bombardier, the HTTP load generator doing the actual measuring.
+RUN curl -fsSL -o /usr/local/bin/bombardier \
+        https://github.com/codesenberg/bombardier/releases/download/${BOMBARDIER_VERSION}/bombardier-linux-${TARGETARCH} \
+    && chmod +x /usr/local/bin/bombardier \
+    && bombardier --version
 
-# Cache go modules, build and execute the binary
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
-COPY go.mod .
-ENV GOPROXY=direct
+WORKDIR /app
+
+# Warm every dependency cache before copying the full sources, so code
+# changes don't invalidate these slow layers.
+COPY go.mod go.sum ./
 RUN go mod download
+
+COPY _code/ _code/
+RUN set -e; for m in $(find _code -name go.mod); do \
+        (cd "$(dirname "$m")" && go mod download); \
+    done
+RUN set -e; for d in _code/*/express _code/*/koa _code/*/fastify; do \
+        (cd "$d" && npm ci --omit=dev --no-fund --no-audit); \
+    done
+RUN set -e; for p in $(find _code -name '*.csproj'); do \
+        dotnet restore "$p"; \
+    done
+
 COPY . .
-RUN go install
+RUN go build -trimpath -ldflags="-s -w" -o /usr/local/bin/server-benchmarks .
 
-VOLUME [ "/data" ]
-
+VOLUME ["/data"]
 ENTRYPOINT ["server-benchmarks", "-o", "/data", "-wait-run", "6s"]
 
-# docker build -t server-benchmarks:latest .
-# docker run -v ${PWD}:/data server-benchmarks
+# Build: docker build -t server-benchmarks .
+# Run:   docker run --rm -v ${PWD}:/data server-benchmarks

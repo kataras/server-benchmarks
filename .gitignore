@@ -1,11 +1,22 @@
+# Editors.
 .vscode
+
+# Build artifacts.
 *.exe
 bin
 obj
+binaries
 node_modules
-package-lock.json
+
+# Generated reports (run `server-benchmarks` to produce them).
+output/
+RESULTS.md
+results.json
+/*.svg
+/*.csv
+
+# Local development files.
 tests.dev.yml
 dev
 client_secret.json
-binaries
 _code/rest/request.json

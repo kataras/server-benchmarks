@@ -1,23 +1,38 @@
 # Contributing
 
-First of all read our [Code of Conduct](CODE_OF_CONDUCT.md).
+First of all, read our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Found a bug?
 
-Open a new [issue](https://github.com/kataras/server-benchmarks/issues/new).
- * Write the Operating System and the version of your machine.
- * Describe your problem, what did you expect to see and what you see instead.
- * If it's a feature request, describe your idea as better as you can.
+Open a new [issue](https://github.com/kataras/server-benchmarks/issues/new) with:
+
+* your operating system and machine specs,
+* what you expected to see and what you saw instead,
+* for feature requests, a description of the idea.
 
 ## Adding a framework
 
-Only HTTP/2-featured web frameworks are acceptable here as this is the production line and the future of a secure environment.
+Actively maintained frameworks with real-world usage are welcome.
 
 1. Fork the [repository](https://github.com/kataras/server-benchmarks).
-2. Make your changes.
-    * Add the source code of the stress test at `./_code/%FRAMEWORK%/%TEST%` directory.
-    * Edit the [./tests.yml](./tests.yml) configuration file accordingly.
-        * See the available tests (e.g. "Parameterized") and add the framework on its "Envs" list.
-            * If not available test for your stress-case please add a new, the configuration file is fully customizable.
-        * Order does not matter, the fastest will be shown first and e.t.c.
-3. Compare & Push the PR from [here](https://github.com/kataras/server-benchmarks/compare).
+2. Add one self-contained app per test at `./_code/<test>/<framework>/`:
+   * Go: `go.mod`, `go.sum` and `main.go`
+   * Javascript: `package.json`, `package-lock.json` and `main.js`
+   * C#: a `.csproj` and `Program.cs`
+3. Add the framework to each test's `Envs` list in [tests.yml](tests.yml). Order does not matter; reports sort by measured speed.
+4. Verify your pairing locally, e.g. `server-benchmarks run -t static.myframework`.
+5. Open a [pull request](https://github.com/kataras/server-benchmarks/compare).
+
+### The app contract
+
+Every app listens on `localhost:5000` and answers:
+
+| Test | Request | Expected response |
+|------|:--------|:------------------|
+| static | `GET /` | 200, body `Index` |
+| parameterized | `GET /hello/{name}` | 200, body `Hello {name}` |
+| rest | `POST /{id}` with a JSON array of `{name, language, id, bio, version}` | 200, JSON `{"id": <int>, "count": <array length>, "first_id": <first element's id>}` |
+
+For the rest test: limit the request body to 2MB, answer 404 for a non-integer `{id}` and 400 for a malformed body. Use the framework's production settings (release mode, logging off), the way its own documentation recommends. Existing apps under [`_code/rest/`](_code/rest) are the reference.
+
+Benchmarking an unreleased or private framework needs no public repository at all; see "Test a private or unreleased framework" in the [README](README.md).

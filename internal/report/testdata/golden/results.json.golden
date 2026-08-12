@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-12T14:30:00Z",
+  "system": {
+    "processor": "Snapdragon X Elite X1E80100",
+    "ram": "31.69 GB",
+    "os": "Microsoft Windows 11 Home",
+    "bombardier": "v2.0.2",
+    "go": "go1.26.5",
+    "dotnet": "10.0.100",
+    "node": "v24.4.1"
+  },
+  "tests": [
+    {
+      "name": "Static",
+      "description": "Fires 100000 requests, receives a static message as response.",
+      "envs": [
+        {
+          "name": "Iris",
+          "language": "Go",
+          "link": "https://github.com/kataras/iris",
+          "status": "ok",
+          "result": {
+            "bytesRead": 15000000,
+            "bytesWritten": 4000000,
+            "timeTakenSeconds": 0.3520389957820096,
+            "req1xx": 0,
+            "req2xx": 100000,
+            "req3xx": 0,
+            "req4xx": 0,
+            "req5xx": 0,
+            "others": 0,
+            "latency": {
+              "mean": 438.94,
+              "stddev": 109.735,
+              "max": 8778.8
+            },
+            "rps": {
+              "mean": 284059.44,
+              "stddev": 28405.944,
+              "max": 340871.328
+            }
+          }
+        },
+        {
+          "name": "Fastify",
+          "language": "Javascript",
+          "link": "https://github.com/fastify/fastify",
+          "status": "ok",
+          "result": {
+            "bytesRead": 15000000,
+            "bytesWritten": 4000000,
+            "timeTakenSeconds": 0.5555243227436324,
+            "req1xx": 0,
+            "req2xx": 100000,
+            "req3xx": 0,
+            "req4xx": 0,
+            "req5xx": 0,
+            "others": 0,
+            "latency": {
+              "mean": 690.12,
+              "stddev": 172.53,
+              "max": 13802.4
+            },
+            "rps": {
+              "mean": 180010.12,
+              "stddev": 18001.012,
+              "max": 216012.144
+            }
+          }
+        },
+        {
+          "name": "ASP.NET Core",
+          "language": "C#",
+          "link": "https://github.com/dotnet/aspnetcore",
+          "status": "ok",
+          "result": {
+            "bytesRead": 15000000,
+            "bytesWritten": 4000000,
+            "timeTakenSeconds": 0.6666642222311852,
+            "req1xx": 0,
+            "req2xx": 100000,
+            "req3xx": 0,
+            "req4xx": 0,
+            "req5xx": 0,
+            "others": 0,
+            "latency": {
+              "mean": 830.77,
+              "stddev": 207.6925,
+              "max": 16615.4
+            },
+            "rps": {
+              "mean": 150000.55,
+              "stddev": 15000.054999999998,
+              "max": 180000.65999999997
+            }
+          }
+        },
+        {
+          "name": "Iris (next)",
+          "language": "Go",
+          "status": "ok",
+          "result": {
+            "bytesRead": 15000000,
+            "bytesWritten": 4000000,
+            "timeTakenSeconds": 0.8330256691861805,
+            "req1xx": 0,
+            "req2xx": 100000,
+            "req3xx": 0,
+            "req4xx": 0,
+            "req5xx": 0,
+            "others": 0,
+            "latency": {
+              "mean": 990.01,
+              "stddev": 247.5025,
+              "max": 19800.2
+            },
+            "rps": {
+              "mean": 120044.32,
+              "stddev": 12004.432,
+              "max": 144053.184
+            }
+          }
+        },
+        {
+          "name": "Gin",
+          "language": "Go",
+          "link": "https://github.com/gin-gonic/gin",
+          "status": "failed",
+          "error": "Static: Gin: 5 non-successful responses [2xx: 99995, 3xx: 0, 4xx: 5, 5xx: 0, others: 0]"
+        },
+        {
+          "name": "Koa",
+          "language": "Javascript",
+          "link": "https://github.com/koajs/koa",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "name": "REST",
+      "description": "Fires 100000 requests with a 1MB JSON body.",
+      "envs": [
+        {
+          "name": "Iris",
+          "language": "Go",
+          "link": "https://github.com/kataras/iris",
+          "status": "ok",
+          "result": {
+            "bytesRead": 15000000,
+            "bytesWritten": 4000000,
+            "timeTakenSeconds": 0.4184903779855313,
+            "req1xx": 0,
+            "req2xx": 100000,
+            "req3xx": 0,
+            "req4xx": 0,
+            "req5xx": 0,
+            "others": 0,
+            "latency": {
+              "mean": 520.33,
+              "stddev": 130.0825,
+              "max": 10406.6
+            },
+            "rps": {
+              "mean": 238954.12,
+              "stddev": 23895.412,
+              "max": 286744.94399999996
+            }
+          }
+        },
+        {
+          "name": "Fastify",
+          "language": "Javascript",
+          "link": "https://github.com/fastify/fastify",
+          "status": "ok",
+          "result": {
+            "bytesRead": 15000000,
+            "bytesWritten": 4000000,
+            "timeTakenSeconds": 0.6245160391019484,
+            "req1xx": 0,
+            "req2xx": 100000,
+            "req3xx": 0,
+            "req4xx": 0,
+            "req5xx": 0,
+            "others": 0,
+            "latency": {
+              "mean": 780.45,
+              "stddev": 195.1125,
+              "max": 15609
+            },
+            "rps": {
+              "mean": 160123.99,
+              "stddev": 16012.399,
+              "max": 192148.78799999997
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

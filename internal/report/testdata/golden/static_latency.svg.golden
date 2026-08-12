@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="216" viewBox="0 0 920 216" role="img" aria-label="Static: Mean latency (lower is better)">
+<title>Static: Mean latency (lower is better)</title>
+<style>text{font-family:system-ui, -apple-system, 'Segoe UI', sans-serif}
+.surface{fill:#fcfcfb;stroke:rgba(11,11,11,0.10)}
+.title{fill:#0b0b0b;font-size:15px;font-weight:600}
+.subtitle{fill:#898781;font-size:12px}
+.name{fill:#0b0b0b;font-size:12.5px}
+.value{fill:#52514e;font-size:12px}
+.legend{fill:#52514e;font-size:11.5px}
+.baseline{stroke:#c3c2b7;stroke-width:1}
+.s0{fill:#2a78d6}.s1{fill:#eb6834}.s2{fill:#1baf7a}.s3{fill:#eda100}
+.s4{fill:#e87ba4}.s5{fill:#008300}.s6{fill:#4a3aa7}.s7{fill:#e34948}
+@media (prefers-color-scheme: dark){
+.surface{fill:#1a1a19;stroke:rgba(255,255,255,0.10)}
+.title{fill:#ffffff}
+.name{fill:#ffffff}
+.value{fill:#c3c2b7}
+.legend{fill:#c3c2b7}
+.baseline{stroke:#383835}
+.s0{fill:#3987e5}.s1{fill:#d95926}.s2{fill:#199e70}.s3{fill:#c98500}
+.s4{fill:#d55181}.s5{fill:#008300}.s6{fill:#9085e9}.s7{fill:#e66767}
+}</style>
+<rect class="surface" x="0.5" y="0.5" width="919" height="215" rx="8"/>
+<text class="title" x="20" y="30">Static</text>
+<text class="subtitle" x="20" y="50">Mean latency (lower is better)</text>
+<text class="legend" x="886.7" y="30">C#</text>
+<rect class="s2" x="870.7" y="21" width="10" height="10" rx="3"/>
+<text class="legend" x="786.0" y="30">Javascript</text>
+<rect class="s1" x="770.0" y="21" width="10" height="10" rx="3"/>
+<text class="legend" x="738.6" y="30">Go</text>
+<rect class="s0" x="722.6" y="21" width="10" height="10" rx="3"/>
+<text class="name" text-anchor="end" x="170" y="97.25">Iris</text>
+<path class="s0" d="M180.0,84.0 h270.9 a4.0,4.0 0 0 1 4.0,4.0 v10.0 a4.0,4.0 0 0 1 -4.0,4.0 h-270.9 z"/>
+<text class="value" x="462.9" y="97.25">438.94us</text>
+<text class="name" text-anchor="end" x="170" y="127.25">Fastify</text>
+<path class="s1" d="M180.0,114.0 h428.2 a4.0,4.0 0 0 1 4.0,4.0 v10.0 a4.0,4.0 0 0 1 -4.0,4.0 h-428.2 z"/>
+<text class="value" x="620.2" y="127.25">690.12us</text>
+<text class="name" text-anchor="end" x="170" y="157.25">ASP.NET Core</text>
+<path class="s2" d="M180.0,144.0 h516.3 a4.0,4.0 0 0 1 4.0,4.0 v10.0 a4.0,4.0 0 0 1 -4.0,4.0 h-516.3 z"/>
+<text class="value" x="708.3" y="157.25">830.77us</text>
+<text class="name" text-anchor="end" x="170" y="187.25">Iris (next)</text>
+<path class="s0" d="M180.0,174.0 h616.0 a4.0,4.0 0 0 1 4.0,4.0 v10.0 a4.0,4.0 0 0 1 -4.0,4.0 h-616.0 z"/>
+<text class="value" x="808.0" y="187.25">0.99ms</text>
+<line class="baseline" x1="180.5" y1="72" x2="180.5" y2="200"/>
+</svg>

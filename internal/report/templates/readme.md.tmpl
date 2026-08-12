@@ -1,0 +1,54 @@
+# Server Benchmarks
+
+A benchmark suite which, transparently, stress-tests web servers and generates reports in Markdown, CSV, JSON and SVG charts. It measures requests per second, latency, data transfer and total completion time.
+
+## Why
+
+Most benchmark suites don't test real-life applications. This suite runs each framework's application as a self-contained program and measures it with a trusted third-party HTTP load generator, [bombardier](https://github.com/codesenberg/bombardier), which acts as a real HTTP client — one more reason of transparency. [Contributions](CONTRIBUTING.md) and improvements are always welcome.
+
+## Installation
+
+The only requirement for the benchmark tool itself is the [Go Programming Language](https://go.dev/dl/).
+
+```sh
+go install github.com/kataras/server-benchmarks@latest
+go install github.com/codesenberg/bombardier@latest
+```
+
+Depending on the test cases you run, you may also need [Node.js](https://nodejs.org/) and the [.NET SDK](https://dotnet.microsoft.com/download).
+
+## How to run
+
+1. Navigate to the directory that contains your **tests.yml** file
+2. Run `server-benchmarks`
+3. Open the generated **RESULTS.md** file
+
+Useful variants:
+
+```sh
+# run only specific tests or environments:
+server-benchmarks run -t rest -t static.iris
+
+# custom spec file, output directory and settle time between runs:
+server-benchmarks run -i ./tests.dev.yml -o ./dev -wait-run 3s
+
+# list the tests of a spec without running anything:
+server-benchmarks list
+
+# re-render the reports (Markdown, CSV, SVG) of a previous run:
+server-benchmarks export -i ./results.json -o ./
+```
+
+### Run using Docker
+
+```sh
+docker build -t server-benchmarks .
+docker run --rm -v ${PWD}:/data server-benchmarks
+```
+
+## Benchmarks
+
+{{template "results.md.tmpl" .}}
+## License
+
+This project is licensed under the [MIT License](LICENSE).

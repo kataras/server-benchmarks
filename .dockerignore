@@ -1,6 +1,12 @@
-tests.dev.yml
-client_secret.json
-./dev
+.git
+.github
+.vscode
+binaries
 node_modules
 bin
 obj
+output
+dev
+tests.dev.yml
+client_secret.json
+*.exe

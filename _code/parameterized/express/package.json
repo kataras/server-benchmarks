@@ -1,10 +1,10 @@
 {
-  "name": "expressjs-throng",
+  "name": "parameterized-express",
+  "private": true,
   "main": "main.js",
-  "author": "Gerasimos (Makis) Maropoulos <kataras2006@hotmail.com>",
-  "license": "ISC",
+  "author": "Gerasimos (Makis) Maropoulos <contact@hellenic.dev>",
+  "license": "MIT",
   "dependencies": {
-    "express": "^5.0.0",
-    "throng": "^5.0.0"
+    "express": "^5.2.1"
   }
 }

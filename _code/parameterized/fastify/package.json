@@ -1,0 +1,10 @@
+{
+  "name": "parameterized-fastify",
+  "private": true,
+  "main": "main.js",
+  "author": "Gerasimos (Makis) Maropoulos <contact@hellenic.dev>",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "^5.11.3"
+  }
+}

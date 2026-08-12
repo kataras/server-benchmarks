@@ -1,0 +1,54 @@
+## System
+
+|    |    |
+|----|:---|
+| Processor | {{.System.Processor}} |
+| RAM | {{.System.RAM}} |
+| OS | {{.System.OS}} |
+{{- if .System.Bombardier}}
+| [Bombardier](https://github.com/codesenberg/bombardier) | {{.System.Bombardier}} |
+{{- end}}
+{{- if .System.Go}}
+| [Go](https://go.dev) | {{.System.Go}} |
+{{- end}}
+{{- if .System.Dotnet}}
+| [.NET](https://dotnet.microsoft.com/) | {{.System.Dotnet}} |
+{{- end}}
+{{- if .System.Node}}
+| [Node.js](https://nodejs.org/) | {{.System.Node}} |
+{{- end}}
+
+> Last updated: {{.Datetime}}
+
+## Terminology
+
+**Name** is the name of the framework (or router) used under a particular test.
+
+**Reqs/sec** is the average number of requests processed per second (the higher the better).
+
+**Latency** is the time from when a request is made by the client until the response gets back to that client (the lower the better).
+
+**Throughput** is the rate at which data is transferred (the higher the better; it depends on the response length, body plus headers).
+
+**Time To Complete** is the total time the test took to complete (the lower the better).
+
+## Results
+{{range .Tests}}
+### Test: {{.Name}}
+{{if .Description}}
+📖 {{.Description}}
+{{end}}
+{{- if .HasChart}}
+![{{.Name}}: requests per second]({{.ChartFile}})
+
+![{{.Name}}: latency]({{.LatencyChartFile}})
+{{end}}
+| Name | Language | Reqs/sec | Latency | Throughput | Time To Complete |
+|------|:---------|:---------|:--------|:-----------|:-----------------|
+{{range .Rows -}}
+| {{if .Link}}[{{.Name}}]({{.Link}}){{else}}{{.Name}}{{end}} | {{.Language}} | {{.ReqsPerSec}} | {{.Latency}} | {{.Throughput}} | {{.TimeTaken}} |
+{{end -}}
+{{range .Failures}}
+> ⚠️ **{{.Name}}**: {{.Error}}
+{{end -}}
+{{end}}

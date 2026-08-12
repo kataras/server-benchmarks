@@ -1,0 +1,5 @@
+Name,Reqs/sec
+Iris,284059
+Fastify,180010
+ASP.NET Core,150001
+Iris (next),120044

@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: 1.26.x
+
+      - name: Cross-compile
+        run: |
+          set -e
+          mkdir -p dist
+          for target in linux/amd64 linux/386 linux/arm64 linux/arm windows/amd64 windows/386 darwin/amd64 darwin/arm64; do
+            goos=${target%/*} goarch=${target#*/}
+            out="dist/server-benchmarks-$goos-$goarch"
+            [ "$goos" = "windows" ] && out="$out.exe"
+            echo "== $target"
+            CGO_ENABLED=0 GOOS=$goos GOARCH=$goarch \
+              go build -trimpath -ldflags="-s -w" -o "$out" .
+          done
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --generate-notes
