@@ -31,7 +31,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/schollz/closestmatch v2.1.0+incompatible // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
+	github.com/sirupsen/logrus v1.8.3 // indirect
 	github.com/tdewolff/minify/v2 v2.24.14 // indirect
 	github.com/tdewolff/parse/v2 v2.8.14 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
