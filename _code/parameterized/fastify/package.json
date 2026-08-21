@@ -5,6 +5,6 @@
   "author": "Gerasimos (Makis) Maropoulos <contact@hellenic.dev>",
   "license": "MIT",
   "dependencies": {
-    "fastify": "^5.11.3"
+    "fastify": "^5.12.0"
   }
 }
